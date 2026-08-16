@@ -1,1 +1,64 @@
-/* You can add global styles to this file, and also import other style files */
+/* ==========================================================================
+   CliniCare brand — global theme
+   Blue / gray palette, applied across the app. Pages may reference these
+   tokens from their component-scoped styles.
+   ========================================================================== */
+
+:root {
+  /* Brand blues */
+  --clini-blue-700: #1d4ed8;
+  --clini-blue-600: #2563eb;
+  --clini-blue-500: #3b82f6;
+  --clini-blue-400: #60a5fa;
+  --clini-blue-100: #dbeafe;
+  --clini-blue-50: #eff6ff;
+
+  /* Grays / neutrals */
+  --clini-slate-900: #0f172a;
+  --clini-slate-700: #334155;
+  --clini-slate-500: #64748b;
+  --clini-slate-400: #94a3b8;
+  --clini-slate-300: #cbd5e1;
+  --clini-slate-200: #e2e8f0;
+  --clini-slate-100: #f1f5f9;
+  --clini-slate-50: #f8fafc;
+
+  /* Feedback colors */
+  --clini-danger-600: #dc2626;
+  --clini-danger-100: #fee2e2;
+  --clini-success-600: #16a34a;
+  --clini-success-100: #dcfce7;
+
+  /* Elevation */
+  --clini-shadow-card: 0 24px 50px -24px rgba(15, 23, 42, 0.35);
+}
+
+/* Simple reset + base typography */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol';
+  color: var(--clini-slate-900);
+  /* Subtle blue → gray wash for the CliniCare brand. */
+  background: linear-gradient(
+    135deg,
+    var(--clini-slate-50) 0%,
+    var(--clini-slate-100) 55%,
+    var(--clini-blue-100) 120%
+  );
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

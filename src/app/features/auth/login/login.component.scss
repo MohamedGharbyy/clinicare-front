@@ -1,0 +1,229 @@
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 1.5rem;
+}
+
+.collage {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  max-width: 900px;
+  height: min(600px, 84dvh);
+  background: #ffffff;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: var(--clini-shadow-card);
+}
+
+.brand-panel {
+  flex: 0 0 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(
+    160deg,
+    var(--clini-blue-600),
+    var(--clini-blue-700)
+  );
+}
+
+.collage-logo {
+  width: 132px;
+  height: 132px;
+  object-fit: contain;
+}
+
+.card {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #ffffff;
+  padding: 2rem 2rem 1.75rem;
+}
+
+@media (max-width: 760px) {
+  .collage {
+    flex-direction: column;
+    height: auto;
+    max-width: 420px;
+  }
+
+  .brand-panel {
+    flex-basis: auto;
+    width: 100%;
+    min-height: 150px;
+  }
+
+  .collage-logo {
+    width: 96px;
+    height: 96px;
+  }
+
+  .card {
+    height: auto;
+    max-height: 60dvh;
+  }
+}
+
+.heartbeat-band {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 64px;
+  color: var(--clini-blue-100);
+  display: block;
+  pointer-events: none;
+}
+
+.heartbeat-band .heartbeat {
+  width: 100%;
+  height: 100%;
+}
+
+/* Card header */
+.card-header {
+  position: relative;
+  margin: 64px 0 1.5rem;
+  text-align: center;
+}
+
+.card-header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--clini-slate-900);
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 0.35rem 0 0;
+  color: var(--clini-slate-500);
+  font-size: 0.95rem;
+}
+
+.alert {
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.alert-success {
+  background: var(--clini-success-100);
+  color: var(--clini-success-600);
+}
+
+.alert-notice {
+  background: var(--clini-slate-100);
+  color: var(--clini-slate-700);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--clini-slate-700);
+}
+
+.input {
+  font: inherit;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--clini-slate-300);
+  border-radius: 10px;
+  background: var(--clini-slate-50);
+  color: var(--clini-slate-900);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--clini-blue-500);
+  box-shadow: 0 0 0 3px var(--clini-blue-100);
+  background: #ffffff;
+}
+
+.field-error {
+  font-size: 0.8rem;
+  color: var(--clini-danger-600);
+}
+
+.btn {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition:
+    background 0.2s ease,
+    transform 0.05s ease;
+}
+
+.btn:active {
+  transform: scale(0.99);
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--clini-blue-600);
+  color: #ffffff;
+}
+
+.btn-primary:not(:disabled):hover {
+  background: var(--clini-blue-700);
+}
+
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: clini-spin 0.7s linear infinite;
+}
+
+@keyframes clini-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.form-footer {
+  margin: 1.25rem 0 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--clini-slate-500);
+}
+
+.link {
+  color: var(--clini-blue-600);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
