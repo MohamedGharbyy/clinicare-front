@@ -83,8 +83,14 @@ export class LoginComponent {
       .login({ email, password })
       .pipe(finalize(() => this.submitting.set(false)))
       .subscribe({
-        next: (response) => this.router.navigate([this.redirectPath(response.role)]),
+        next: (response) => {
+          // Do not retain the password in the form after it has been sent.
+          this.form.controls.password.reset('');
+          this.router.navigate([this.redirectPath(response.role)]);
+        },
         error: (err) => {
+          // Do not retain a failed credential attempt in the page state either.
+          this.form.controls.password.reset('');
           // On 401 show a single, generic message — never reveal which field
           // was wrong.
           if (err instanceof HttpErrorResponse && err.status === 401) {

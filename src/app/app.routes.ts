@@ -8,7 +8,7 @@ import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'signup' },
+  { path: '', pathMatch: 'full', redirectTo: 'login' },
   { path: 'signup', component: SignupComponent },
   { path: 'login', component: LoginComponent },
   {
@@ -21,5 +21,5 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     children: [{ path: 'dashboard', component: DoctorDashboardComponent }],
   },
-  { path: '**', redirectTo: 'signup' },
+  { path: '**', redirectTo: 'login' },
 ];
