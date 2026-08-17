@@ -1,0 +1,38 @@
+/* ==========================================================================
+   Shared scaffolding for the role dashboards (patient / doctor / admin).
+   Page header (title + subtitle) above an empty content area reserved for
+   the dashboard cards and widgets added in a later stage.
+   ========================================================================== */
+
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  min-height: calc(100dvh - 64px - 4rem);
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--clini-slate-900);
+}
+
+.subtitle {
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  color: var(--clini-slate-500);
+}
+
+/* Empty placeholder that will host dashboard cards and components. */
+.dashboard-content {
+  flex: 1;
+  min-height: 320px;
+  background: #ffffff;
+  border: 1px dashed var(--clini-slate-300);
+  border-radius: 18px;
+}

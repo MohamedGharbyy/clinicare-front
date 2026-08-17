@@ -1,0 +1,419 @@
+:host {
+  display: block;
+}
+
+/* ==========================================================================
+   CliniCare dashboard shell
+   Top navbar + left sidebar + routed main content. Role-agnostic chrome;
+   the sidebar entries come from the authenticated user's role.
+   Primary brand blue: #38B6FF (var(--clini-blue-600)).
+   ========================================================================== */
+
+.shell {
+  min-height: 100dvh;
+}
+
+/* ---- Top navigation bar ------------------------------------------------- */
+.topbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 64px;
+  padding: 0 1.25rem;
+  background: #ffffff;
+  border-bottom: 1px solid var(--clini-slate-200);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 0 0 auto;
+  text-decoration: none;
+}
+
+.brand-logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  object-fit: cover;
+  margin-top: 10px;
+}
+
+.brand-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--clini-slate-900);
+  white-space: nowrap;
+}
+
+.brand-accent {
+  color: var(--clini-blue-600); /* #38B6FF */
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 1 320px;
+  margin-left: 1rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--clini-slate-200);
+  border-radius: 10px;
+  background: var(--clini-slate-50);
+  color: var(--clini-slate-400);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+  }
+
+  &:focus-within {
+    border-color: var(--clini-blue-600);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(56, 182, 255, 0.15);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 0.875rem;
+    color: var(--clini-slate-700);
+
+    &::placeholder {
+      color: var(--clini-slate-400);
+    }
+  }
+}
+
+.topbar-spacer {
+  flex: 1 1 auto;
+}
+
+.icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--clini-slate-500);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: var(--clini-slate-100);
+    color: var(--clini-slate-700);
+  }
+}
+
+.menu-btn {
+  display: none;
+}
+
+.notify-dot {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--clini-blue-600);
+  border: 2px solid #ffffff;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  max-width: 280px;
+  padding: 0.3rem 0.6rem 0.3rem 0.35rem;
+  border: 1px solid var(--clini-slate-200);
+  border-radius: 999px;
+  background: var(--clini-slate-50);
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #38b6ff 0%, #2fa5e8 100%);
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.user-email {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--clini-slate-700);
+}
+
+.role-tag {
+  flex: 0 0 auto;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--clini-blue-100);
+  color: var(--clini-blue-700);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+  height: 40px;
+  padding: 0 0.9rem;
+  border: 1px solid var(--clini-slate-200);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--clini-slate-500);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: var(--clini-danger-100);
+    border-color: var(--clini-danger-100);
+    color: var(--clini-danger-600);
+  }
+}
+
+/* ---- Left sidebar ------------------------------------------------------- */
+.sidebar {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  bottom: 0;
+  z-index: 30;
+  width: 260px;
+  background: #ffffff;
+  border-right: 1px solid var(--clini-slate-200);
+  transition: transform 0.25s ease;
+}
+
+.sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+  padding: 1.25rem 1rem;
+  overflow-y: auto;
+}
+
+.nav-section-label {
+  margin: 0 0 0.5rem;
+  padding: 0 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--clini-slate-400);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--clini-slate-500);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+  }
+
+  &:hover:not(.disabled) {
+    background: var(--clini-slate-100);
+    color: var(--clini-slate-900);
+  }
+
+  &.active {
+    background: var(--clini-blue-50);
+    color: var(--clini-blue-700);
+    font-weight: 600;
+  }
+
+  &.disabled {
+    color: var(--clini-slate-300);
+    cursor: not-allowed;
+  }
+}
+
+.nav-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.soon-badge {
+  margin-left: auto;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: var(--clini-blue-100);
+  color: var(--clini-blue-700);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ---- Mobile backdrop ---------------------------------------------------- */
+.backdrop {
+  position: fixed;
+  inset: 64px 0 0 0;
+  z-index: 25;
+  border: 0;
+  background: rgba(15, 23, 42, 0.45);
+  cursor: pointer;
+}
+
+/* ---- Main content area -------------------------------------------------- */
+.main {
+  margin: 64px 0 0 260px;
+  min-height: calc(100dvh - 64px);
+  padding: 2rem;
+  background: var(--clini-slate-50);
+}
+
+/* ---- Responsive --------------------------------------------------------- */
+
+/* Tablet → collapsed icon rail */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .sidebar {
+    width: 76px;
+  }
+
+  .sidebar-inner {
+    padding: 1.25rem 0.6rem;
+  }
+
+  .nav-section-label {
+    display: none;
+  }
+
+  .nav-item {
+    justify-content: center;
+    gap: 0;
+    padding: 0.75rem;
+  }
+
+  .nav-label,
+  .soon-badge {
+    display: none;
+  }
+
+  .main {
+    margin-left: 76px;
+  }
+
+  .search {
+    flex-basis: 240px;
+  }
+
+  .user-email,
+  .role-tag {
+    display: none;
+  }
+}
+
+/* Phone → off-canvas drawer */
+@media (max-width: 767px) {
+  .topbar {
+    padding: 0 0.75rem;
+  }
+
+  .menu-btn {
+    display: inline-flex;
+  }
+
+  .search,
+  .user-email,
+  .role-tag,
+  .logout-label {
+    display: none;
+  }
+
+  .logout-btn {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .sidebar {
+    width: 280px;
+    transform: translateX(-100%);
+    box-shadow: 0 24px 50px -24px rgba(15, 23, 42, 0.45);
+  }
+
+  .shell.sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .main {
+    margin-left: 0;
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition-duration: 1ms;
+  }
+}

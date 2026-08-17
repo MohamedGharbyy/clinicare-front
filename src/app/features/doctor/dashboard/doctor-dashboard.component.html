@@ -1,9 +1,10 @@
-<div class="page">
-  <div class="panel">
-    <img class="brand-logo" src="/clinicare-logo.png" alt="CliniCare logo" />
+<div class="dashboard-page">
+  <header class="page-header">
     <h1>Doctor dashboard</h1>
-    <p class="user-info" *ngIf="user()">Logged in as: <strong>{{ user()?.email }}</strong></p>
-    <p>This is a placeholder — the doctor dashboard will be built in a later stage.</p>
-    <button class="logout-btn" (click)="logout()">Logout</button>
-  </div>
+    <p class="subtitle">
+      Overview of your practice — patients, appointments, and schedule at a glance.
+    </p>
+  </header>
+  <!-- Reserved content: dashboard cards and widgets will be mounted here. -->
+  <section class="dashboard-content" aria-label="Dashboard widgets"></section>
 </div>
