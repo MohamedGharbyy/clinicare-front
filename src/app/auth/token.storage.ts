@@ -1,5 +1,6 @@
 import { InjectionToken } from '@angular/core';
 import type { AuthState } from './auth.models';
+import { isJwtExpired, isValidUserInfo } from './jwt.utils';
 
 /**
  * Persistence contract for the auth state. Components and services only depend
@@ -36,11 +37,19 @@ export class LocalStorageTokenStorage implements TokenStorage {
     }
     try {
       const parsed = JSON.parse(raw) as AuthState;
-      if (!parsed || typeof parsed.token !== 'string' || !parsed.user) {
+      if (
+        !parsed ||
+        typeof parsed.token !== 'string' ||
+        !isValidUserInfo(parsed.user) ||
+        isJwtExpired(parsed.token)
+      ) {
+        // Purge expired or malformed session data immediately
+        this.clear();
         return null;
       }
       return parsed;
     } catch {
+      this.clear();
       return null;
     }
   }
@@ -49,7 +58,11 @@ export class LocalStorageTokenStorage implements TokenStorage {
     if (typeof localStorage === 'undefined') {
       return;
     }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    if (state.token && state.user && !isJwtExpired(state.token)) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } else {
+      this.clear();
+    }
   }
 
   clear(): void {

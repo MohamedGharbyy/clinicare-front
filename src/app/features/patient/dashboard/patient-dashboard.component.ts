@@ -1,10 +1,22 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-patient-dashboard',
-  imports: [RouterLink],
+  imports: [CommonModule],
   templateUrl: './patient-dashboard.component.html',
   styleUrl: './patient-dashboard.component.scss',
 })
-export class PatientDashboardComponent {}
+export class PatientDashboardComponent {
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
+  readonly user = this.authService.user;
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+}

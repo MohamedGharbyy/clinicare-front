@@ -1,23 +1,41 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
 
-import { TOKEN_STORAGE } from './token.storage';
+import { AuthService } from './auth.service';
+import { isJwtExpired } from './jwt.utils';
 
 /**
  * Functional HTTP interceptor that attaches the current bearer token to every
- * outgoing request. Reads the token from the {@link TOKEN_STORAGE} abstraction
- * (not localStorage directly) so the storage strategy stays swappable.
+ * outgoing request if authenticated and unexpired.
+ * If a protected request receives a 401 Unauthorized response, it clears the
+ * stale auth session and redirects the user to /login.
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const storage = inject(TOKEN_STORAGE);
-  const token = storage.read()?.token;
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  const token = authService.token();
 
-  if (token) {
-    const authorized = req.clone({
+  let request = req;
+  if (token && !isJwtExpired(token)) {
+    request = req.clone({
       setHeaders: { Authorization: `Bearer ${token}` },
     });
-    return next(authorized);
   }
 
-  return next(req);
-};
+  return next(request).pipe(
+    catchError((error) => {
+      if (
+        error instanceof HttpErrorResponse &&
+        error.status === 401 &&
+        !req.url.includes('/api/auth/login') &&
+        !req.url.includes('/api/auth/register')
+      ) {
+        authService.logout();
+        router.navigate(['/login']);
+      }
+      return throwError(() => error);
+    }),
+  );
+};

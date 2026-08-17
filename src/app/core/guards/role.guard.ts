@@ -8,6 +8,7 @@ import type {
 
 import { AuthService } from '../../auth/auth.service';
 import type { UserRole } from '../../auth/auth.models';
+import { normalizeRole } from '../../auth/jwt.utils';
 
 /** Route prefix → the role required to access that guarded area. */
 const PREFIX_TO_ROLE: Record<string, UserRole> = {
@@ -44,8 +45,17 @@ export const roleGuard: CanActivateFn = (
   const authService = inject(AuthService);
   const router = inject(Router);
 
+  if (!authService.isAuthenticated()) {
+    if (authService.state().token !== null || authService.state().user !== null) {
+      authService.logout();
+    }
+    return router.createUrlTree(['/login']);
+  }
+
   const user = authService.user();
-  if (!user) {
+  const userRole = user ? normalizeRole(user.role) : null;
+  if (!userRole) {
+    authService.logout();
     return router.createUrlTree(['/login']);
   }
 
@@ -55,36 +65,11 @@ export const roleGuard: CanActivateFn = (
     return true;
   }
 
-  // Normalize user role to handle potential format mismatches
-  const userRole = normalizeRole(user.role);
-  
   if (userRole === requiredRole) {
     return true;
   }
 
   // Wrong role for this area — take them to their own dashboard.
   const redirectTo = ROLE_TO_DASHBOARD[userRole] ?? '/login';
-  console.debug(`Role guard: user role ${userRole} doesn't match required ${requiredRole}, redirecting to ${redirectTo}`);
   return router.createUrlTree([redirectTo]);
 };
-
-/**
- * Normalize role from various possible formats to a known UserRole.
- * Handles cases where role might come from different sources or be formatted unexpectedly.
- */
-function normalizeRole(role: unknown): UserRole {
-  if (typeof role === 'string') {
-    const upper = role.toUpperCase();
-    if (upper === 'PATIENT' || upper === 'DOCTOR' || upper === 'ADMIN') {
-      return upper as UserRole;
-    }
-  }
-  
-  // If role is an object with a name property (e.g., from JSON enum deserialization)
-  if (typeof role === 'object' && role !== null && 'name' in role) {
-    return normalizeRole((role as any).name);
-  }
-  
-  console.warn('Could not normalize role:', role);
-  return 'PATIENT'; // Safe default fallback
-}

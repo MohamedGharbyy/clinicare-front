@@ -11,6 +11,7 @@ import type {
   RegisterResponse,
 } from './auth.models';
 import { TOKEN_STORAGE } from './token.storage';
+import { isJwtExpired, isValidUserInfo } from './jwt.utils';
 
 /**
  * Base URL of the backend API. The clinicare-back service answers on the
@@ -25,16 +26,34 @@ export class AuthService {
 
   /**
    * Source of truth for the current auth state. Initialized from the active
-   * {@link TokenStorage} so a refresh restores the session.
+   * {@link TokenStorage} so a refresh restores a valid session.
    */
   private readonly authState = signal<AuthState>(this.readState());
 
   readonly state = this.authState.asReadonly();
-  readonly user = computed(() => this.authState().user);
-  readonly token = computed(() => this.authState().token);
-  readonly isAuthenticated = computed(
-    () => this.authState().token !== null && this.authState().user !== null,
-  );
+  readonly user = computed(() => {
+    const s = this.authState();
+    if (!s.token || isJwtExpired(s.token) || !isValidUserInfo(s.user)) {
+      return null;
+    }
+    return s.user;
+  });
+  readonly token = computed(() => {
+    const s = this.authState();
+    if (!s.token || isJwtExpired(s.token)) {
+      return null;
+    }
+    return s.token;
+  });
+  readonly isAuthenticated = computed(() => {
+    const s = this.authState();
+    return (
+      s.token !== null &&
+      s.user !== null &&
+      !isJwtExpired(s.token) &&
+      isValidUserInfo(s.user)
+    );
+  });
 
   /**
    * Creates a new account. The backend responds with the created user only
@@ -63,6 +82,11 @@ export class AuthService {
   logout(): void {
     this.storage.clear();
     this.authState.set({ token: null, user: null });
+  }
+
+  /** Helper to check token expiration. */
+  isTokenExpired(token: string | null | undefined): boolean {
+    return isJwtExpired(token);
   }
 
   private readState(): AuthState {

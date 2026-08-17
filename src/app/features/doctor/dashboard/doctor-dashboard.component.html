@@ -2,7 +2,8 @@
   <div class="panel">
     <img class="brand-logo" src="/clinicare-logo.png" alt="CliniCare logo" />
     <h1>Doctor dashboard</h1>
+    <p class="user-info" *ngIf="user()">Logged in as: <strong>{{ user()?.email }}</strong></p>
     <p>This is a placeholder — the doctor dashboard will be built in a later stage.</p>
-    <a class="link" routerLink="/login">Back to login</a>
+    <button class="logout-btn" (click)="logout()">Logout</button>
   </div>
 </div>
