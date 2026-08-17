@@ -50,7 +50,7 @@
 .logout-btn {
   width: 100%;
   padding: 0.75rem 1rem;
-  background: var(--clini-red-600);
+  background: var(--clini-blue-600);
   color: white;
   border: none;
   border-radius: 8px;
@@ -59,10 +59,10 @@
   transition: background 0.2s ease;
 
   &:hover {
-    background: var(--clini-red-700);
+    background: var(--clini-blue-700);
   }
 
   &:active {
-    background: var(--clini-red-800);
+    background: var(--clini-blue-800);
   }
 }
