@@ -61,16 +61,54 @@ export class LoginComponent {
   }
 
   /** Role-based landing page after a successful login. */
-  private redirectPath(role: UserRole): string {
-    switch (role) {
+  private redirectPath(role: unknown): string {
+    // Normalize the role value in case it comes through in an unexpected format
+    console.debug('redirectPath() called with role:', role, 'typeof:', typeof role, 'full role object:', JSON.stringify(role));
+    const normalizedRole = this.normalizeRole(role);
+    console.debug('Normalized role result:', normalizedRole);
+    
+    switch (normalizedRole) {
       case 'PATIENT':
         return '/patient/dashboard';
       case 'DOCTOR':
         return '/doctor/dashboard';
+      case 'ADMIN':
+        return '/admin/dashboard';
       default:
-        // Unknown role (e.g. ADMIN) — no dashboard for it yet.
+        console.warn('Unknown role received:', role, 'normalized to:', normalizedRole, 'switch will default to /login');
         return '/login';
     }
+  }
+
+  /** Ensure role is a valid UserRole type, handling various formats. */
+  private normalizeRole(role: unknown): UserRole | null {
+    console.debug('normalizeRole() checking:', role, 'typeof:', typeof role);
+    
+    if (typeof role === 'string') {
+      console.debug('normalizeRole() input is string:', role);
+      // Role is already a string, check if it's valid
+      if (role === 'PATIENT' || role === 'DOCTOR' || role === 'ADMIN') {
+        console.debug('normalizeRole() found exact match:', role);
+        return role;
+      }
+      // Try uppercase in case it comes in lowercase or mixed case
+      const upper = role.toUpperCase();
+      console.debug('normalizeRole() trying uppercase:', upper);
+      if (upper === 'PATIENT' || upper === 'DOCTOR' || upper === 'ADMIN') {
+        console.debug('normalizeRole() uppercase matched:', upper);
+        return upper as UserRole;
+      }
+      console.warn('normalizeRole() string did not match any known role:', role);
+    }
+    
+    // If role is an object (e.g., from JSON deserialization), try to extract it
+    if (typeof role === 'object' && role !== null && 'name' in role) {
+      console.debug('normalizeRole() found object with name property:', (role as any).name);
+      return this.normalizeRole((role as any).name);
+    }
+    
+    console.warn('normalizeRole() could not normalize:', role, 'typeof:', typeof role);
+    return null;
   }
 
   onSubmit(): void {
@@ -89,7 +127,9 @@ export class LoginComponent {
         next: (response) => {
           // Do not retain the password in the form after it has been sent.
           this.form.controls.password.reset('');
-          this.router.navigate([this.redirectPath(response.role)]);
+          const redirectUrl = this.redirectPath(response.role);
+          console.debug('Login successful, redirecting to:', redirectUrl, 'for role:', response.role);
+          this.router.navigate([redirectUrl]);
         },
         error: (err) => {
           // Do not retain a failed credential attempt in the page state either.

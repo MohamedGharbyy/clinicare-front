@@ -1,0 +1,9 @@
+<div class="page">
+  <div class="panel">
+    <img class="brand-logo" src="/clinicare-logo.png" alt="CliniCare logo" />
+    <h1>Admin dashboard</h1>
+    <p class="user-info" *ngIf="user()">Logged in as: <strong>{{ user()?.email }}</strong></p>
+    <p>Welcome to the CliniCare administration panel. You can manage users, view system statistics, and configure application settings here.</p>
+    <button class="logout-btn" (click)="logout()">Logout</button>
+  </div>
+</div>
