@@ -23,7 +23,10 @@ const passwordMatchValidator: ValidatorFn = (group: AbstractControl) =>
   selector: 'app-signup',
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './signup.component.html',
-  styleUrl: './signup.component.scss',
+  styleUrls: [
+    './signup.component.scss',
+    '../auth-shared.scss'
+  ]
 })
 export class SignupComponent {
   private readonly fb = inject(FormBuilder);

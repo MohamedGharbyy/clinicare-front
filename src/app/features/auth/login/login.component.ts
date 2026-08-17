@@ -15,7 +15,10 @@ import type { UserRole } from '../../../auth/auth.models';
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
+  styleUrls: [
+    './login.component.scss',
+    '../auth-shared.scss'
+  ]
 })
 export class LoginComponent {
   private readonly fb = inject(FormBuilder);
