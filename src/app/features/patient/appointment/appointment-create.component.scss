@@ -1,0 +1,409 @@
+/* ==========================================================================
+   Create-an-appointment page (patient).
+   Follows the CliniCare design system; primary brand blue is #38B6FF.
+   Shared page scaffolding lives in layout/dashboard-page.scss.
+   ========================================================================== */
+
+.appointment-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* ---- Form card ----------------------------------------------------------- */
+.appointment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-card {
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid var(--clini-slate-200);
+  border-radius: 18px;
+  box-shadow: var(--clini-shadow-card);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--clini-slate-700);
+}
+
+.optional {
+  font-weight: 400;
+  color: var(--clini-slate-400);
+}
+
+.label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.char-counter {
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  color: var(--clini-slate-400);
+}
+
+.input {
+  width: 100%;
+  font: inherit;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--clini-slate-300);
+  border-radius: 10px;
+  background: var(--clini-slate-50);
+  color: var(--clini-slate-900);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #38b6ff;
+    box-shadow: 0 0 0 3px rgba(56, 182, 255, 0.18);
+    background: #ffffff;
+  }
+
+  &::placeholder {
+    color: var(--clini-slate-400);
+  }
+}
+
+textarea.input {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Invalid fields: red border and focus ring. */
+.field.has-error .input {
+  border-color: var(--clini-danger-600);
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+  }
+}
+
+.field-error {
+  font-size: 0.8rem;
+  color: var(--clini-danger-600);
+}
+
+/* ---- Doctor selector ----------------------------------------------------- */
+.doctor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 0.75rem;
+}
+
+.doctor-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem;
+  border: 1px solid var(--clini-slate-200);
+  border-radius: 12px;
+  background: #ffffff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+
+  &:hover {
+    border-color: var(--clini-blue-600);
+    background: var(--clini-blue-50);
+  }
+
+  &.selected {
+    border-color: var(--clini-blue-600);
+    background: var(--clini-blue-50);
+    box-shadow: 0 0 0 3px rgba(56, 182, 255, 0.18);
+  }
+}
+
+.doctor-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--clini-blue-100);
+  color: var(--clini-blue-700);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.doctor-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.doctor-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--clini-slate-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doctor-specialty {
+  font-size: 0.78rem;
+  color: var(--clini-slate-500);
+}
+
+.doctor-check {
+  display: none;
+  margin-left: auto;
+  color: var(--clini-blue-700);
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.doctor-card.selected .doctor-check {
+  display: inline-flex;
+}
+
+/* ---- Buttons ------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font: inherit;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.05s ease;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
+.btn-lg {
+  padding: 0.85rem 1.5rem;
+}
+
+.btn-primary {
+  background: #38b6ff;
+  color: #ffffff;
+  box-shadow: 0 12px 24px -12px rgba(56, 182, 255, 0.65);
+
+  &:hover {
+    background: #1fa8ff;
+  }
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: var(--clini-slate-700);
+  border-color: var(--clini-slate-300);
+
+  &:hover {
+    background: var(--clini-slate-100);
+    color: var(--clini-slate-900);
+  }
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* ---- Live summary -------------------------------------------------------- */
+.summary-card {
+  position: sticky;
+  top: calc(64px + 2rem);
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid var(--clini-slate-200);
+  border-radius: 18px;
+  box-shadow: var(--clini-shadow-card);
+}
+
+.summary-title {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--clini-slate-900);
+}
+
+.summary-list {
+  margin: 0;
+
+  div {
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--clini-slate-100);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+}
+
+.summary-list dt {
+  margin-bottom: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--clini-slate-400);
+}
+
+.summary-list dd {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--clini-slate-900);
+  overflow-wrap: anywhere;
+}
+
+.summary-sub {
+  margin-top: 0.1rem !important;
+  font-size: 0.78rem !important;
+  font-weight: 400 !important;
+  color: var(--clini-slate-500);
+}
+
+.summary-note {
+  margin: 1rem 0 0;
+  font-size: 0.78rem;
+  color: var(--clini-slate-400);
+}
+
+/* ---- Success panel ------------------------------------------------------- */
+.success-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 360px;
+  padding: 2rem;
+  background: #ffffff;
+  border: 1px solid var(--clini-slate-200);
+  border-radius: 18px;
+  box-shadow: var(--clini-shadow-card);
+  text-align: center;
+}
+
+.success-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 1rem;
+  border-radius: 50%;
+  background: var(--clini-success-100);
+  color: var(--clini-success-600);
+
+  svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.success-panel h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--clini-slate-900);
+}
+
+.success-text {
+  max-width: 460px;
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+  color: var(--clini-slate-500);
+
+  strong {
+    color: var(--clini-slate-900);
+  }
+}
+
+.success-hint {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--clini-slate-400);
+}
+
+.success-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+/* ---- Responsive ---------------------------------------------------------- */
+@media (max-width: 960px) {
+  .appointment-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-card {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions,
+  .success-actions {
+    flex-direction: column;
+  }
+
+  .btn-lg {
+    width: 100%;
+  }
+}

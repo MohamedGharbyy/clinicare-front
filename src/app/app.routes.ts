@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './features/auth/login/login.component';
 import { SignupComponent } from './features/auth/signup/signup.component';
 import { PatientDashboardComponent } from './features/patient/dashboard/patient-dashboard.component';
+import { AppointmentCreateComponent } from './features/patient/appointment/appointment-create.component';
 import { DoctorDashboardComponent } from './features/doctor/dashboard/doctor-dashboard.component';
 import { AdminDashboardComponent } from './features/admin/dashboard/admin-dashboard.component';
 import { DashboardLayoutComponent } from './layout/dashboard-layout/dashboard-layout.component';
@@ -21,6 +22,7 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', component: PatientDashboardComponent },
+      { path: 'appointment', component: AppointmentCreateComponent },
     ],
   },
   {
