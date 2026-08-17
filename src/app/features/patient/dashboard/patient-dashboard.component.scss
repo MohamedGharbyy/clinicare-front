@@ -1,2 +1,213 @@
 /* Page-level styles for the patient dashboard. Shared page scaffolding lives
    in layout/dashboard-page.scss. */
+
+/* The shared scaffolding renders .dashboard-content as a dashed placeholder;
+   turn it into a real content stack (patient dashboard only). */
+:host .dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+/* ---- Primary action ----------------------------------------------------- */
+.action-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid var(--clini-slate-200);
+  border-radius: 18px;
+  box-shadow: var(--clini-shadow-card);
+}
+
+.action-strip-text h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--clini-slate-900);
+}
+
+.action-strip-text p {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  color: var(--clini-slate-500);
+}
+
+.btn-create-appointment {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.4rem;
+  border: 0;
+  border-radius: 12px;
+  background: var(--clini-blue-600); /* #38B6FF */
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 12px 24px -12px rgba(56, 182, 255, 0.65);
+  transition:
+    background 0.2s ease,
+    transform 0.05s ease;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: #1fa8ff;
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
+/* ---- Summary cards ------------------------------------------------------ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.25rem;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: #ffffff;
+  border: 1px solid var(--clini-slate-200);
+  border-radius: 18px;
+  box-shadow: var(--clini-shadow-card);
+}
+
+.stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  border-radius: 12px;
+  background: var(--clini-blue-50);
+  color: var(--clini-blue-700);
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.stat-info {
+  min-width: 0;
+}
+
+.stat-label {
+  margin: 0 0 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--clini-slate-500);
+}
+
+.stat-value {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--clini-slate-900);
+}
+
+/* ---- Content panels ----------------------------------------------------- */
+.panels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid var(--clini-slate-200);
+  border-radius: 18px;
+  box-shadow: var(--clini-shadow-card);
+}
+
+.panel-header {
+  padding: 1.25rem 1.5rem 0;
+
+  h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--clini-slate-900);
+  }
+}
+
+.panel-body {
+  padding: 1.5rem;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  padding: 1.5rem;
+  text-align: center;
+  background: var(--clini-slate-50);
+  border: 1px dashed var(--clini-slate-300);
+  border-radius: 14px;
+}
+
+.empty-state-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0.75rem;
+  border-radius: 50%;
+  background: var(--clini-blue-50);
+  color: var(--clini-blue-700);
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.empty-state-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--clini-slate-700);
+}
+
+.empty-state-hint {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--clini-slate-400);
+}
+
+/* ---- Responsive --------------------------------------------------------- */
+@media (max-width: 640px) {
+  .action-strip {
+    padding: 1.25rem;
+  }
+
+  .btn-create-appointment {
+    width: 100%;
+    justify-content: center;
+  }
+}
