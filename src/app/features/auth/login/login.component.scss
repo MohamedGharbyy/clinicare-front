@@ -10,7 +10,7 @@
   display: flex;
   align-items: stretch;
   width: 100%;
-  max-width: 1250px;
+  max-width: 1200px;
   height: min(600px, 84dvh);
   background: #ffffff;
   border-radius: 28px;
@@ -19,21 +19,12 @@
 }
 
 .brand-panel {
+  position: relative;
   flex: 0 0 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  background: #ffffff;
+  min-width: 0;
+  background:
+    url('/clinicare-login-signup.png') left center / cover no-repeat;
   border-right: 1px solid #dfe3e8;
-}
-
-.collage-logo {
-  width: 132px;
-  height: 132px;
-  object-fit: contain;
-  transform: scale(5);
-  transform-origin: center;
 }
 
 .card {
@@ -47,6 +38,20 @@
   padding: 2rem 2rem 1.75rem;
 }
 
+@media (max-width: 900px) {
+  .collage {
+    height: min(560px, 78dvh);
+  }
+
+  .brand-panel {
+    flex-basis: 42%;
+  }
+
+  .card {
+    padding: 1.5rem 1.25rem 1.25rem;
+  }
+}
+
 @media (max-width: 760px) {
   .collage {
     flex-direction: column;
@@ -57,13 +62,8 @@
   .brand-panel {
     flex-basis: auto;
     width: 100%;
-    min-height: 150px;
-  }
-
-  .collage-logo {
-    width: 96px;
-    height: 96px;
-    transform: scale(3);
+    min-height: 220px;
+    background-position: center top;
   }
 
   .card {
@@ -72,24 +72,10 @@
   }
 }
 
-.heartbeat-band {
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 64px;
-  color: rgba(56, 182, 255, 0.18);
-  display: block;
-  pointer-events: none;
-}
-
-.heartbeat-band .heartbeat {
-  width: 100%;
-  height: 100%;
-}
-
 /* Card header */
 .card-header {
   position: relative;
-  margin: 64px 0 1.5rem;
+  margin: 0 0 1.5rem;
   text-align: center;
 }
 
