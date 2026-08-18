@@ -46,14 +46,17 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
-  scrollbar-width: auto;
-  scrollbar-color: #38b6ff var(--clini-blue-100);
+  scrollbar-width: thin;
+  scrollbar-color: #38b6ff transparent;
 }
 
-/* Wider, branded scrollbars (Chromium, Safari, and Edge). */
+/* Slim, understated brand scrollbars (Chromium, Safari, and Edge).
+   The scrollbar gutter is invisible; only a thin, low-opacity thumb shows.
+   8px leaves room for the thumb to grow to 8px wide on hover without
+   shifting the page layout. */
 ::-webkit-scrollbar {
-  width: 14px;
-  height: 14px;
+  width: 8px;
+  height: 8px;
 }
 
 /* Remove the arrow buttons at each end of the scrollbar. */
@@ -78,23 +81,36 @@ body {
   display: none;
 }
 
+/* Fully transparent track — no tint and no artificial top/bottom padding,
+   so the thumb spans the entire usable scroll area and reaches both limits. */
 ::-webkit-scrollbar-track {
   background: transparent;
-}
-
-/* Shorten the visible vertical scrolling track at its top and bottom. */
-::-webkit-scrollbar-track:vertical {
-  margin-block: 24px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #38b6ff;
-  border: 3px solid transparent;
   border-radius: 999px;
 }
 
+/* Slim 6px brand-blue thumb with fully rounded corners. The transparent
+   inline border trims the fill horizontally while `background-clip:
+   padding-box` keeps it full height, so there are no awkward gaps at the
+   top or bottom. It starts subtle and low-opacity until hovered. */
+::-webkit-scrollbar-thumb {
+  background: #38b6ff;
+  background-clip: padding-box;
+  border-inline: 1px solid transparent;
+  border-radius: 999px;
+  opacity: 0.35;
+  -webkit-transition:
+    background-color 0.28s ease,
+    border-inline-width 0.28s ease,
+    opacity 0.28s ease;
+  transition:
+    background-color 0.28s ease,
+    border-inline-width 0.28s ease,
+    opacity 0.28s ease;
+}
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #149fe9;
+  border-inline-width: 0;
+  opacity: 1;
 }
 
 /* Smoothly blend between the login and sign-up routes. */
@@ -132,6 +148,7 @@ body {
 @supports selector(::-webkit-scrollbar) {
   html,
   body {
+    scrollbar-width: auto;
     scrollbar-color: auto;
   }
 }
