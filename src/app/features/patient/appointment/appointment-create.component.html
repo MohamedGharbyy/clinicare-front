@@ -25,7 +25,7 @@
       <h2>Request sent!</h2>
       <p class="success-text">
         Your appointment request with
-        <strong>{{ selectedDoctor()?.name }}</strong> on <strong>{{ formattedDate() }}</strong> at
+        <strong>{{ selectedDoctor()?.name | doctorName }}</strong> on <strong>{{ formattedDate() }}</strong> at
         <strong>{{ form.controls.time.value }}</strong> has been received.
       </p>
       <p class="success-hint">The clinic will confirm your booking shortly.</p>
@@ -65,7 +65,7 @@
                   >
                     <span class="doctor-avatar" aria-hidden="true">{{ doctor.initials }}</span>
                     <span class="doctor-info">
-                      <span class="doctor-name">{{ doctor.name }}</span>
+                      <span class="doctor-name">{{ doctor.name | doctorName }}</span>
                       <span class="doctor-specialty">{{ doctor.specialty }}</span>
                     </span>
                     <span class="doctor-check" aria-hidden="true">
@@ -195,7 +195,7 @@
         <dl class="summary-list">
           <div>
             <dt>Doctor</dt>
-            <dd>{{ selectedDoctor()?.name ?? '—' }}</dd>
+            <dd>{{ selectedDoctor()?.name }}</dd>
             @if (selectedDoctor()) {
               <dd class="summary-sub">{{ selectedDoctor()?.specialty }}</dd>
             }

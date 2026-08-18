@@ -106,7 +106,7 @@
           } @else if (nextUpcomingAppointment(); as appointment) {
             <div class="appointment-slot">
               <div class="slot-details">
-                <span class="slot-doctor">{{ appointment.doctorName }}</span>
+                <span class="slot-doctor">{{ appointment.doctorName | doctorName }}</span>
                 <span class="slot-specialty">{{ appointment.doctorSpecialty }}</span>
                 <span class="slot-time">{{ appointmentSlot(appointment) }}</span>
               </div>

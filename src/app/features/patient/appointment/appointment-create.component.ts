@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { DoctorNamePipe } from '../../../core/pipes/doctor-name.pipe';
 import {
   AbstractControl,
   FormBuilder,
@@ -49,7 +50,7 @@ const futureDateValidator: ValidatorFn = (control: AbstractControl) => {
 
 @Component({
   selector: 'app-appointment-create',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, DoctorNamePipe],
   templateUrl: './appointment-create.component.html',
   styleUrls: ['./appointment-create.component.scss', '../../../layout/dashboard-page.scss'],
 })

@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DoctorNamePipe } from '../../../core/pipes/doctor-name.pipe';
 import { finalize, forkJoin } from 'rxjs';
 
 import { AppointmentService } from '../../../core/services/appointment.service';
@@ -33,7 +34,7 @@ function formatDate(date: string): string {
 
 @Component({
   selector: 'app-patient-dashboard',
-  imports: [RouterLink],
+  imports: [RouterLink, DoctorNamePipe],
   templateUrl: './patient-dashboard.component.html',
   styleUrls: ['./patient-dashboard.component.scss', '../../../layout/dashboard-page.scss'],
 })
