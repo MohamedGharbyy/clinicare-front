@@ -43,38 +43,49 @@
           <!-- Doctor selection -->
           <div class="field">
             <span class="label" id="doctor-field-label">Choose a doctor</span>
-            <div class="doctor-grid" role="radiogroup" aria-labelledby="doctor-field-label">
-              @for (doctor of doctors; track doctor.id) {
-                <button
-                  type="button"
-                  class="doctor-card"
-                  [class.selected]="form.controls.doctorId.value === doctor.id"
-                  role="radio"
-                  [attr.aria-checked]="form.controls.doctorId.value === doctor.id"
-                  (click)="selectDoctor(doctor.id)"
-                >
-                  <span class="doctor-avatar" aria-hidden="true">{{ doctor.initials }}</span>
-                  <span class="doctor-info">
-                    <span class="doctor-name">{{ doctor.name }}</span>
-                    <span class="doctor-specialty">{{ doctor.specialty }}</span>
-                  </span>
-                  <span class="doctor-check" aria-hidden="true">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="3"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <path d="m5 13 4 4L19 7" />
-                    </svg>
-                  </span>
-                </button>
+            @if (doctorsLoading()) {
+              <p class="doctor-status">Loading doctors…</p>
+            } @else if (doctorsError(); as message) {
+              <p class="doctor-status is-error" role="alert">{{ message }}</p>
+              <div class="doctor-retry">
+                <button type="button" class="btn btn-secondary" (click)="loadDoctors()">Retry</button>
+              </div>
+            } @else if (doctors().length === 0) {
+              <p class="doctor-status">No doctors are currently available. Please try again later.</p>
+            } @else {
+              <div class="doctor-grid" role="radiogroup" aria-labelledby="doctor-field-label">
+                @for (doctor of doctors(); track doctor.id) {
+                  <button
+                    type="button"
+                    class="doctor-card"
+                    [class.selected]="form.controls.doctorId.value === doctor.id"
+                    role="radio"
+                    [attr.aria-checked]="form.controls.doctorId.value === doctor.id"
+                    (click)="selectDoctor(doctor.id)"
+                  >
+                    <span class="doctor-avatar" aria-hidden="true">{{ doctor.initials }}</span>
+                    <span class="doctor-info">
+                      <span class="doctor-name">{{ doctor.name }}</span>
+                      <span class="doctor-specialty">{{ doctor.specialty }}</span>
+                    </span>
+                    <span class="doctor-check" aria-hidden="true">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="m5 13 4 4L19 7" />
+                      </svg>
+                    </span>
+                  </button>
+                }
+              </div>
+              @if (fieldError('doctorId'); as msg) {
+                <span class="field-error">{{ msg }}</span>
               }
-            </div>
-            @if (fieldError('doctorId'); as msg) {
-              <span class="field-error">{{ msg }}</span>
             }
           </div>
 
@@ -151,10 +162,14 @@
               <span class="field-error">{{ msg }}</span>
             }
           </div>
+          <!-- Server-side booking errors -->
+          @if (submitError(); as message) {
+            <div class="form-error" role="alert">{{ message }}</div>
+          }
           <!-- Form actions -->
           <div class="form-actions">
             <a class="btn btn-secondary btn-lg" routerLink="/patient/dashboard"> Cancel </a>
-            <button type="submit" class="btn btn-primary btn-lg">
+            <button type="submit" class="btn btn-primary btn-lg" [disabled]="submitting()">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -168,7 +183,7 @@
                 <path d="M16 2v4M8 2v4M3 10h18" />
                 <path d="M12 14v4M10 16h4" />
               </svg>
-              Request Appointment
+              {{ submitting() ? 'Booking…' : 'Request Appointment' }}
             </button>
           </div>
         </div>

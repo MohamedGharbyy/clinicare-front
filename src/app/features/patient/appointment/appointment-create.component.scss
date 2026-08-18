@@ -111,6 +111,37 @@ textarea.input {
   color: var(--clini-danger-600);
 }
 
+/* ---- Doctor list status / retry ----------------------------------------- */
+.doctor-status {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  border: 1px dashed var(--clini-slate-300);
+  border-radius: 12px;
+  font-size: 0.85rem;
+  color: var(--clini-slate-500);
+  background: var(--clini-slate-50);
+
+  &.is-error {
+    border-color: var(--clini-danger-600);
+    color: var(--clini-danger-600);
+    background: var(--clini-danger-100);
+  }
+}
+
+.doctor-retry {
+  margin-top: 0.5rem;
+}
+
+/* ---- Server-side booking error ------------------------------------------ */
+.form-error {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--clini-danger-600);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: var(--clini-danger-600);
+  background: var(--clini-danger-100);
+}
+
 /* ---- Doctor selector ----------------------------------------------------- */
 .doctor-grid {
   display: grid;

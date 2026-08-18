@@ -200,6 +200,70 @@
   color: var(--clini-slate-400);
 }
 
+/* ---- Upcoming appointment (real data) ----------------------------------- */
+.appointments-status {
+  margin: 0;
+  padding: 1.25rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--clini-slate-500);
+  background: var(--clini-slate-50);
+  border: 1px dashed var(--clini-slate-300);
+  border-radius: 14px;
+
+  &.is-error {
+    color: var(--clini-danger-600);
+  }
+}
+
+.appointment-slot {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--clini-blue-50);
+  border: 1px solid var(--clini-blue-100);
+  border-radius: 14px;
+}
+
+.slot-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.slot-doctor {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--clini-slate-900);
+}
+
+.slot-specialty {
+  font-size: 0.85rem;
+  color: var(--clini-blue-700);
+}
+
+.slot-time {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--clini-slate-500);
+}
+
+.status-pill {
+  flex: 0 0 auto;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: #ffffff;
+  color: var(--clini-slate-500);
+  border: 1px solid var(--clini-slate-300);
+}
+
 /* ---- Responsive --------------------------------------------------------- */
 @media (max-width: 640px) {
   .action-strip {

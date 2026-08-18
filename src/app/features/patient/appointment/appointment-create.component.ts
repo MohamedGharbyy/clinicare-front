@@ -1,4 +1,6 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -7,27 +9,28 @@ import {
   Validators,
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
+
+import { AppointmentService } from '../../../core/services/appointment.service';
+import { DoctorService } from '../../../core/services/doctor.service';
 
 /** A doctor offered in the booking form. */
-export interface MockDoctor {
-  id: string;
+export interface DoctorOption {
+  /** Real database id ({@code doctor_profiles.id}), sent as {@code doctorId}. */
+  id: number;
   name: string;
   specialty: string;
+  /** Two-letter initials derived from the doctor's name (avatar). */
   initials: string;
 }
 
-/**
- * Placeholder doctor list until a doctors endpoint exists.
- * TODO: Replace with real data once the doctors API is available.
- */
-const MOCK_DOCTORS: MockDoctor[] = [
-  { id: 'd1', name: 'Dr. Sarah Mitchell', specialty: 'General Medicine', initials: 'SM' },
-  { id: 'd2', name: 'Dr. Omar Haddad', specialty: 'Cardiology', initials: 'OH' },
-  { id: 'd3', name: 'Dr. Elena Rossi', specialty: 'Dermatology', initials: 'ER' },
-  { id: 'd4', name: 'Dr. James Carter', specialty: 'Pediatrics', initials: 'JC' },
-  { id: 'd5', name: 'Dr. Amira Benali', specialty: 'Neurology', initials: 'AB' },
-  { id: 'd6', name: 'Dr. Lucas Meyer', specialty: 'Orthopedics', initials: 'LM' },
-];
+/** Avatar initials, e.g. "Sarah Mitchell" -> "SM". */
+function initialsFromName(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+}
 
 /** Rejects appointment dates earlier than today. */
 const futureDateValidator: ValidatorFn = (control: AbstractControl) => {
@@ -52,30 +55,76 @@ const futureDateValidator: ValidatorFn = (control: AbstractControl) => {
 })
 export class AppointmentCreateComponent {
   private readonly fb = inject(FormBuilder);
+  private readonly doctorService = inject(DoctorService);
+  private readonly appointmentService = inject(AppointmentService);
 
-  /** Mock doctors shown in the booking form. */
-  readonly doctors = MOCK_DOCTORS;
+  /** Doctors loaded from the backend, preserving their real database ids. */
+  readonly doctors = signal<DoctorOption[]>([]);
+  readonly doctorsLoading = signal(true);
+  readonly doctorsError = signal<string | null>(null);
+
+  /** True while the booking request is in flight. */
+  readonly submitting = signal(false);
+
+  /** Backend error surfaced to the user when a booking is rejected. */
+  readonly submitError = signal<string | null>(null);
 
   /** Earliest selectable date — today, so past dates are never bookable. */
   readonly minDate = new Date().toISOString().slice(0, 10);
 
-  /** True once the (simulated) request has been submitted successfully. */
+  /** True only after the backend has successfully created the appointment. */
   readonly submitted = signal(false);
 
   readonly form = this.fb.nonNullable.group({
-    doctorId: ['', Validators.required],
+    doctorId: [null as number | null, Validators.required],
     date: ['', [Validators.required, futureDateValidator]],
     time: ['', Validators.required],
     reason: ['', [Validators.required, Validators.maxLength(200)]],
     notes: ['', [Validators.maxLength(1000)]],
   });
 
+  /**
+   * The selected doctorId as a signal, derived from the reactive form so the
+   * summary card stays in sync with the selection. The form control remains the
+   * single source of truth; this bridge lets {@link selectedDoctor} recompute.
+   */
+  private readonly doctorIdValue = toSignal(this.form.controls.doctorId.valueChanges, {
+    initialValue: null as number | null,
+  });
+
+  constructor() {
+    this.loadDoctors();
+  }
+
   /** Selected doctor object, used by the live summary and success panel. */
   readonly selectedDoctor = computed(
-    () => this.doctors.find((d) => d.id === this.form.controls.doctorId.value) ?? null,
+    () => this.doctors().find((d) => d.id === this.doctorIdValue()) ?? null,
   );
 
-  selectDoctor(id: string): void {
+  /** Fetches the backend doctor list, preserving each doctor's numeric id. */
+  loadDoctors(): void {
+    this.doctorsLoading.set(true);
+    this.doctorsError.set(null);
+    this.doctorService.getDoctors().subscribe({
+      next: (list) => {
+        this.doctors.set(
+          list.map((d) => ({
+            id: d.id,
+            name: d.name,
+            specialty: d.specialty,
+            initials: initialsFromName(d.name),
+          })),
+        );
+        this.doctorsLoading.set(false);
+      },
+      error: () => {
+        this.doctorsError.set('Could not load the list of doctors. Please try again.');
+        this.doctorsLoading.set(false);
+      },
+    });
+  }
+
+  selectDoctor(id: number): void {
     this.form.controls.doctorId.setValue(id);
   }
 
@@ -125,15 +174,52 @@ export class AppointmentCreateComponent {
 
   onSubmit(): void {
     this.form.markAllAsTouched();
+    this.submitError.set(null);
     if (this.form.invalid) {
       return;
     }
-    // No backend connected yet — simply confirm the request.
-    this.submitted.set(true);
+
+    const { doctorId, date, time, reason, notes } = this.form.controls;
+    if (doctorId.value === null) {
+      doctorId.setErrors({ required: true });
+      return;
+    }
+
+    this.submitting.set(true);
+    this.appointmentService
+      .create({
+        doctorId: doctorId.value,
+        appointmentDate: date.value,
+        appointmentTime: time.value,
+        reason: reason.value,
+        notes: notes.value || undefined,
+      })
+      .pipe(finalize(() => this.submitting.set(false)))
+      .subscribe({
+        // Success panel only appears once the backend has persisted the row.
+        next: () => this.submitted.set(true),
+        error: (error: unknown) => this.submitError.set(this.errorMessage(error)),
+      });
   }
 
   resetForm(): void {
     this.form.reset();
     this.submitted.set(false);
+    this.submitError.set(null);
+    this.loadDoctors();
+  }
+
+  /** Maps an API failure to a human-readable message. */
+  private errorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      const body = error.error as { message?: string } | null;
+      if (body?.message) {
+        return body.message;
+      }
+      if (error.status === 0) {
+        return 'Unable to reach the server. Please check your connection and try again.';
+      }
+    }
+    return 'Could not book the appointment. Please try again.';
   }
 }

@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { tap } from 'rxjs';
+
+import { API_BASE_URL } from '../core/api-base-url';
 import type { Observable } from 'rxjs';
 
 import type {
@@ -12,12 +14,6 @@ import type {
 } from './auth.models';
 import { TOKEN_STORAGE } from './token.storage';
 import { isJwtExpired, isValidUserInfo } from './jwt.utils';
-
-/**
- * Base URL of the backend API. The clinicare-back service answers on the
- * default Spring port and is configured to allow CORS from localhost:4200.
- */
-const API_BASE_URL = 'http://localhost:8080';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

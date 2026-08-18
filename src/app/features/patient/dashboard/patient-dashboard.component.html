@@ -46,7 +46,7 @@
         </span>
         <div class="stat-info">
           <p class="stat-label">Upcoming Appointment</p>
-          <p class="stat-value">{{ upcomingAppointment }}</p>
+          <p class="stat-value">{{ upcomingAppointmentLabel() }}</p>
         </div>
       </article>
 
@@ -67,7 +67,7 @@
         </span>
         <div class="stat-info">
           <p class="stat-label">Total Appointments</p>
-          <p class="stat-value">{{ totalAppointments }}</p>
+          <p class="stat-value">{{ appointmentsLoading() ? '—' : totalAppointments() }}</p>
         </div>
       </article>
 
@@ -87,7 +87,7 @@
         </span>
         <div class="stat-info">
           <p class="stat-label">Pending Requests</p>
-          <p class="stat-value">{{ pendingRequests }}</p>
+          <p class="stat-value">{{ appointmentsLoading() ? '—' : pendingRequests() }}</p>
         </div>
       </article>
     </div>
@@ -99,23 +99,38 @@
           <h2 id="upcoming-section-title">Upcoming Appointment</h2>
         </header>
         <div class="panel-body">
-          <div class="empty-state">
-            <span class="empty-state-icon" aria-hidden="true">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect x="3" y="4" width="18" height="18" rx="2" />
-                <path d="M16 2v4M8 2v4M3 10h18" />
-              </svg>
-            </span>
-            <p class="empty-state-title">No upcoming appointment yet</p>
-            <p class="empty-state-hint">Once you book a visit, it will show up here.</p>
-          </div>
+          @if (appointmentsLoading()) {
+            <p class="appointments-status">Loading your appointments…</p>
+          } @else if (appointmentsError(); as message) {
+            <p class="appointments-status is-error" role="alert">{{ message }}</p>
+          } @else if (nextUpcomingAppointment(); as appointment) {
+            <div class="appointment-slot">
+              <div class="slot-details">
+                <span class="slot-doctor">{{ appointment.doctorName }}</span>
+                <span class="slot-specialty">{{ appointment.doctorSpecialty }}</span>
+                <span class="slot-time">{{ appointmentSlot(appointment) }}</span>
+              </div>
+              <span class="status-pill">{{ appointment.status }}</span>
+            </div>
+          } @else {
+            <div class="empty-state">
+              <span class="empty-state-icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <path d="M16 2v4M8 2v4M3 10h18" />
+                </svg>
+              </span>
+              <p class="empty-state-title">No upcoming appointment yet</p>
+              <p class="empty-state-hint">Once you book a visit, it will show up here.</p>
+            </div>
+          }
         </div>
       </section>
 
