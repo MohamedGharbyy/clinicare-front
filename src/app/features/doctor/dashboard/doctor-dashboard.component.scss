@@ -1,2 +1,540 @@
-/* Page-level styles for the doctor dashboard. Shared page scaffolding lives
-   in layout/dashboard-page.scss. */
+/* ==========================================================================
+   Doctor dashboard page-level styles.
+   Follows the CliniCare design system; primary brand blue is #38B6FF.
+   Shared page scaffolding (.dashboard-page, .page-header and the dashed
+   .dashboard-content placeholder) lives in layout/dashboard-page.scss and is
+   overridden here so the cards and panels render as a real content stack.
+   ========================================================================== */
+
+/* Turn the shared placeholder `.dashboard-content` into a content stack. */
+:host .dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* ---- Doctor identity (header greeting) ------------------------------------ */
+.doctor-greeting {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--clini-slate-900);
+}
+
+.doctor-name {
+  white-space: nowrap;
+}
+
+.doctor-specialty-divider {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--clini-slate-300);
+}
+
+.doctor-specialty {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--clini-blue-700);
+}
+
+/* ---- Error banner --------------------------------------------------------- */
+.dashboard-error {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--clini-danger-600);
+  border-radius: 12px;
+  font-size: 0.875rem;
+  color: var(--clini-danger-600);
+  background: var(--clini-danger-100);
+}
+
+.dashboard-error-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.btn-text {
+  margin-left: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--clini-blue-600);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    color: var(--clini-blue-700);
+    background: var(--clini-blue-50);
+    border-color: var(--clini-blue-100);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--clini-blue-600);
+    outline-offset: 2px;
+  }
+}
+
+/* ---- Summary cards -------------------------------------------------------- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.25rem;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: #ffffff;
+  border: 1px solid var(--clini-slate-200);
+  border-radius: 18px;
+  box-shadow: var(--clini-shadow-card);
+  animation: stat-card-in 280ms ease-out both;
+}
+
+.stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  border-radius: 12px;
+  background: var(--clini-blue-50);
+  color: var(--clini-blue-700);
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.stat-info {
+  min-width: 0;
+}
+
+.stat-label {
+  margin: 0 0 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--clini-slate-500);
+}
+
+.stat-value {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--clini-slate-900);
+}
+
+/* ---- Content panels ------------------------------------------------------- */
+.panels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid var(--clini-slate-200);
+  border-radius: 18px;
+  box-shadow: var(--clini-shadow-card);
+  animation: stat-card-in 280ms ease-out both;
+}
+
+.panel-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem 0;
+
+  h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--clini-slate-900);
+  }
+
+  .panel-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--clini-slate-500);
+  }
+}
+
+.panel-body {
+  padding: 1.5rem;
+}
+
+.appointments-status {
+  margin: 0;
+  padding: 1.25rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--clini-slate-500);
+  background: var(--clini-slate-50);
+  border: 1px dashed var(--clini-slate-300);
+  border-radius: 14px;
+}
+
+/* ---- Empty states --------------------------------------------------------- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  padding: 1.5rem;
+  text-align: center;
+  background: var(--clini-slate-50);
+  border: 1px dashed var(--clini-slate-300);
+  border-radius: 14px;
+}
+
+.empty-state-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0.75rem;
+  border-radius: 50%;
+  background: var(--clini-blue-50);
+  color: var(--clini-blue-700);
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.empty-state-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--clini-slate-700);
+}
+
+.empty-state-hint {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--clini-slate-400);
+}
+
+/* ---- Appointment list rows ------------------------------------------------ */
+.appointment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.appointment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.appointment-main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.patient-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--clini-blue-700);
+  background: var(--clini-blue-50);
+  border-radius: 10px;
+}
+
+.appointment-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.patient-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--clini-slate-900);
+}
+
+.appointment-reason {
+  margin-top: 0.1rem;
+  max-width: 100%;
+  font-size: 0.8rem;
+  color: var(--clini-slate-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.appointment-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.appointment-time {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--clini-slate-700);
+}
+
+/* ---- Status pills --------------------------------------------------------- */
+.status-pill {
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  /* Unrecognised / neutral status. */
+  &:not(.is-pending):not(.is-confirmed):not(.is-completed):not(.is-negative) {
+    background: #ffffff;
+    color: var(--clini-slate-500);
+    border: 1px solid var(--clini-slate-300);
+  }
+}
+
+.status-pill.is-pending {
+  background: var(--clini-blue-50);
+  color: var(--clini-blue-700);
+  border: 1px solid var(--clini-blue-100);
+}
+
+.status-pill.is-confirmed {
+  background: var(--clini-success-100);
+  color: var(--clini-success-600);
+}
+
+.status-pill.is-completed {
+  background: var(--clini-slate-100);
+  color: var(--clini-slate-700);
+}
+
+.status-pill.is-negative {
+  background: var(--clini-danger-100);
+  color: var(--clini-danger-600);
+}
+
+/* ---- Pending request cards ----------------------------------------------- */
+.request-error {
+  margin: 0 0 0.75rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--clini-danger-600);
+  border-radius: 10px;
+  font-size: 0.8rem;
+  color: var(--clini-danger-600);
+  background: var(--clini-danger-100);
+}
+
+.request-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.request-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem;
+  background: #ffffff;
+  border: 1px solid var(--clini-slate-200);
+  border-radius: 14px;
+}
+
+.request-main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.request-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.request-slot {
+  margin-top: 0.1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--clini-slate-500);
+}
+
+.request-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0.35rem 0 0;
+}
+
+.request-field {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+
+  dt {
+    flex: 0 0 auto;
+    min-width: 4rem;
+    font-weight: 600;
+    color: var(--clini-slate-500);
+  }
+
+  dd {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--clini-slate-700);
+  }
+}
+
+.request-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.request-btn {
+  flex: 1;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 9px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
+.request-btn.request-accept {
+  color: #ffffff;
+  background: var(--clini-success-600);
+  border-color: var(--clini-success-600);
+
+  &:hover:not(:disabled) {
+    background: #128a3e; /* darker success green */
+  }
+}
+
+.request-btn.request-reject {
+  color: var(--clini-danger-600);
+  background: transparent;
+  border-color: var(--clini-danger-600);
+
+  &:hover:not(:disabled) {
+    background: var(--clini-danger-100);
+    border-color: var(--clini-danger-600);
+  }
+}
+
+.request-btn:focus-visible {
+  outline: 2px solid var(--clini-blue-600);
+  outline-offset: 2px;
+}
+
+/* ---- Entrance animation --------------------------------------------------- */
+@keyframes stat-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Responsive ----------------------------------------------------------- */
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panels-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .request-actions {
+    flex-direction: column;
+  }
+
+  .appointment-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .appointment-side {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stat-card,
+  .panel {
+    animation: none;
+  }
+}

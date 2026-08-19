@@ -57,4 +57,37 @@ export class AppointmentService {
   getUpcomingAppointments(): Observable<Appointment[]> {
     return this.http.get<Appointment[]>(`${API_BASE_URL}/api/patient/appointments/upcoming`);
   }
+
+  /**
+   * Returns all appointments assigned to the authenticated doctor, derived by
+   * the backend from the JWT principal. The doctor's own name and specialty are
+   * embedded on every returned record, so the UI can read them without an extra
+   * request. Ordered chronologically by the backend.
+   */
+  getDoctorAppointments(): Observable<Appointment[]> {
+    return this.http.get<Appointment[]>(`${API_BASE_URL}/api/doctor/appointments`);
+  }
+
+  /**
+   * Accepts a PENDING appointment assigned to the authenticated doctor. The
+   * backend marks it {@code CONFIRMED} (the system's accepted state) and returns
+   * the updated record.
+   */
+  acceptAppointment(id: number): Observable<Appointment> {
+    return this.http.post<Appointment>(
+      `${API_BASE_URL}/api/doctor/appointments/${id}/accept`,
+      null,
+    );
+  }
+
+  /**
+   * Rejects a PENDING appointment assigned to the authenticated doctor. The
+   * backend marks it {@code REJECTED} and returns the updated record.
+   */
+  rejectAppointment(id: number): Observable<Appointment> {
+    return this.http.post<Appointment>(
+      `${API_BASE_URL}/api/doctor/appointments/${id}/reject`,
+      null,
+    );
+  }
 }
