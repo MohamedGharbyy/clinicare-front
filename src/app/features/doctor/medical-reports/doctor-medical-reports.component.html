@@ -3,17 +3,259 @@
     <h1>Medical Reports</h1>
     <p class="subtitle">View and manage medical reports for your patients.</p>
   </header>
-  <section class="dashboard-content">
-    <div class="empty-state">
-      <span class="empty-state-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <path d="M14 2v6h6" />
-          <path d="M16 13H8M16 17H8M10 9H8" />
-        </svg>
-      </span>
-      <p class="empty-state-title">No medical reports yet</p>
-      <p class="empty-state-hint">Medical reports will be available here in a future update.</p>
+  <section class="dashboard-content" aria-label="Doctor medical reports">
+    <div class="doctor-reports-layout">
+      <!-- Patient selector panel -->
+      <aside class="patient-selector-panel" aria-label="Patient selector">
+        <div class="panel-header">
+          <h2 class="panel-title">Patients</h2>
+          @if (patients().length > 0) {
+            <span class="panel-count">{{ patients().length }}</span>
+          }
+        </div>
+        <div class="patient-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <input
+            type="search"
+            [value]="patientSearchQuery()"
+            (input)="onPatientSearchChange($event)"
+            placeholder="Search patients…"
+            aria-label="Search patients"
+          />
+        </div>
+        <div class="patient-list">
+          @if (patientsLoading()) {
+            <p class="patient-list-status">Loading patients…</p>
+          } @else if (patientsError(); as message) {
+            <p class="patient-list-status is-error" role="alert">{{ message }}</p>
+            <button type="button" class="btn-text" (click)="loadPatients()">Retry</button>
+          } @else if (filteredPatients().length === 0) {
+            <div class="empty-state-compact">
+              <p class="empty-state-title">No patients found</p>
+              <p class="empty-state-hint">Patients from your appointments will appear here.</p>
+            </div>
+          } @else {
+            @for (patient of filteredPatients(); track patient.id) {
+              <button
+                type="button"
+                class="patient-item"
+                [class.selected]="selectedPatientId() === patient.id"
+                (click)="selectPatient(patient.id)"
+                [attr.aria-pressed]="selectedPatientId() === patient.id"
+              >
+                <span class="patient-avatar" aria-hidden="true">{{ patient.initials }}</span>
+                <span class="patient-name">{{ patient.name }}</span>
+              </button>
+            }
+          }
+        </div>
+      </aside>
+
+      <!-- Reports + create form panel -->
+      <main class="reports-main">
+        @if (!selectedPatient()) {
+          <div class="empty-state">
+            <span class="empty-state-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </span>
+            <p class="empty-state-title">Select a patient</p>
+            <p class="empty-state-hint">Choose a patient from the list to view their reports or create a new one.</p>
+          </div>
+        } @else {
+          <div class="patient-reports-view">
+            <div class="view-header">
+              <div class="selected-patient-info">
+                <span class="patient-avatar patient-avatar-lg" aria-hidden="true">{{ selectedPatient()!.initials }}</span>
+                <div>
+                  <h2 class="selected-patient-name">{{ selectedPatient()!.name }}</h2>
+                  <p class="selected-patient-hint">Medical reports for this patient</p>
+                </div>
+              </div>
+              <button type="button" class="btn btn-primary" (click)="showCreateForm.set(!showCreateForm())">
+                @if (showCreateForm()) {
+                  Cancel
+                } @else {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:16px;height:16px;">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  New Report
+                }
+              </button>
+            </div>
+
+            @if (submitSuccess(); as msg) {
+              <div class="dashboard-alert alert-success" role="alert">
+                <span class="alert-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </span>
+                <span class="alert-message">{{ msg }}</span>
+                <button type="button" class="alert-close" (click)="submitSuccess.set(null)" aria-label="Dismiss">&times;</button>
+              </div>
+            }
+            @if (submitError(); as msg) {
+              <div class="dashboard-alert alert-error" role="alert">
+                <span class="alert-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                </span>
+                <span class="alert-message">{{ msg }}</span>
+                <button type="button" class="alert-close" (click)="submitError.set(null)" aria-label="Dismiss">&times;</button>
+              </div>
+            }
+
+            @if (showCreateForm()) {
+              <form class="create-report-form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+                <h3 class="form-title">New Medical Report</h3>
+                <p class="form-subtitle">Add a medical report for {{ selectedPatient()!.name }}.</p>
+
+                <div class="form-grid">
+                  <div class="field field-full" [class.has-error]="form.controls.diagnosis.touched && form.controls.diagnosis.invalid">
+                    <label class="label" for="diagnosis">Diagnosis</label>
+                    <input id="diagnosis" class="input" type="text" formControlName="diagnosis" placeholder="e.g. Acute bronchitis" />
+                    @if (form.controls.diagnosis.touched && form.controls.diagnosis.errors?.['required']) {
+                      <span class="field-error">Diagnosis is required.</span>
+                    }
+                    @if (form.controls.diagnosis.touched && form.controls.diagnosis.errors?.['maxlength']) {
+                      <span class="field-error">Diagnosis must not exceed 255 characters.</span>
+                    }
+                  </div>
+                  <div class="field field-full" [class.has-error]="form.controls.symptoms.touched && form.controls.symptoms.invalid">
+                    <label class="label" for="symptoms">Symptoms</label>
+                    <textarea id="symptoms" class="input textarea" rows="3" formControlName="symptoms" placeholder="Describe the patient's symptoms..."></textarea>
+                    @if (form.controls.symptoms.touched && form.controls.symptoms.errors?.['maxlength']) {
+                      <span class="field-error">Symptoms must not exceed 2000 characters.</span>
+                    }
+                  </div>
+                  <div class="field field-full" [class.has-error]="form.controls.notes.touched && form.controls.notes.invalid">
+                    <label class="label" for="notes">Notes / Recommendations</label>
+                    <textarea id="notes" class="input textarea" rows="3" formControlName="notes" placeholder="Additional notes or recommendations..."></textarea>
+                    @if (form.controls.notes.touched && form.controls.notes.errors?.['maxlength']) {
+                      <span class="field-error">Notes must not exceed 2000 characters.</span>
+                    }
+                  </div>
+                  <div class="field" [class.has-error]="form.controls.reportDate.touched && form.controls.reportDate.invalid">
+                    <label class="label" for="reportDate">Report Date</label>
+                    <input id="reportDate" class="input" type="date" formControlName="reportDate" />
+                    @if (form.controls.reportDate.touched && form.controls.reportDate.errors?.['required']) {
+                      <span class="field-error">Report date is required.</span>
+                    }
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn btn-secondary" (click)="showCreateForm.set(false); resetCreateForm()">Cancel</button>
+                  <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+                    @if (submitting()) {
+                      <span class="btn-spinner" aria-hidden="true"></span> Creating…
+                    } @else {
+                      Create Report
+                    }
+                  </button>
+                </div>
+              </form>
+            }
+
+            <section class="reports-section" aria-labelledby="history-title">
+              <div class="panel-header">
+                <div class="panel-heading">
+                  <h2 id="history-title">Report History</h2>
+                  @if (!reportsLoading() && reports().length > 0) {
+                    <span class="panel-count">{{ reports().length }} total</span>
+                  }
+                </div>
+              </div>
+              <div class="panel-body">
+                @if (reportsLoading()) {
+                  <p class="reports-status" role="status">Loading medical reports…</p>
+                } @else if (reportsError(); as message) {
+                  <div class="dashboard-error" role="alert">
+                    <span class="dashboard-error-icon" aria-hidden="true">!</span>
+                    <span>{{ message }}</span>
+                    <button type="button" class="btn-text" (click)="loadPatientReports(selectedPatientId()!)">Retry</button>
+                  </div>
+                } @else if (reports().length === 0) {
+                  <div class="empty-state">
+                    <span class="empty-state-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <path d="M14 2v6h6" />
+                        <path d="M16 13H8M16 17H8M10 9H8" />
+                      </svg>
+                    </span>
+                    <p class="empty-state-title">No reports yet</p>
+                    <p class="empty-state-hint">Medical reports for this patient will appear here.</p>
+                  </div>
+                } @else {
+                  <div class="reports-list">
+                    @for (report of reports(); track report.id) {
+                      <div class="report-card">
+                        <div class="report-card-header" style="cursor:default;">
+                          <div class="report-card-main">
+                            <span class="report-icon" aria-hidden="true">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <path d="M14 2v6h6" />
+                                <path d="M16 13H8M16 17H8M10 9H8" />
+                              </svg>
+                            </span>
+                            <div class="report-card-info">
+                              <span class="report-doctor">Report #{{ report.id }}</span>
+                              <span class="report-date">{{ formatDate(report.reportDate) }}</span>
+                            </div>
+                          </div>
+                          <div class="report-card-meta">
+                            <span class="report-diagnosis-pill">{{ report.diagnosis }}</span>
+                          </div>
+                        </div>
+                        <div class="report-card-body">
+                          <div class="report-details">
+                            @if (report.appointmentDate) {
+                              <div class="report-row">
+                                <span class="report-label">Appointment Date</span>
+                                <span class="report-value">{{ formatDate(report.appointmentDate) }}</span>
+                              </div>
+                            }
+                            <div class="report-row">
+                              <span class="report-label">Diagnosis</span>
+                              <span class="report-value">{{ report.diagnosis }}</span>
+                            </div>
+                            @if (report.symptoms) {
+                              <div class="report-row">
+                                <span class="report-label">Symptoms</span>
+                                <span class="report-value">{{ report.symptoms }}</span>
+                              </div>
+                            }
+                            @if (report.notes) {
+                              <div class="report-row">
+                                <span class="report-label">Notes</span>
+                                <span class="report-value">{{ report.notes }}</span>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </section>
+          </div>
+        }
+      </main>
     </div>
   </section>
 </div>

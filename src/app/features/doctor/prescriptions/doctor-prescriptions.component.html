@@ -3,17 +3,296 @@
     <h1>Prescriptions</h1>
     <p class="subtitle">Create and manage prescriptions for your patients.</p>
   </header>
-  <section class="dashboard-content">
-    <div class="empty-state">
-      <span class="empty-state-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-          <rect x="9" y="3" width="6" height="4" rx="1" />
-          <path d="M9 12h6M9 16h4" />
-        </svg>
-      </span>
-      <p class="empty-state-title">No prescriptions yet</p>
-      <p class="empty-state-hint">Prescriptions will be available here in a future update.</p>
+  <section class="dashboard-content" aria-label="Doctor prescriptions">
+    <div class="doctor-prescriptions-layout">
+      <!-- Patient selector panel -->
+      <aside class="patient-selector-panel" aria-label="Patient selector">
+        <div class="panel-header">
+          <h2 class="panel-title">Patients</h2>
+          @if (patients().length > 0) {
+            <span class="panel-count">{{ patients().length }}</span>
+          }
+        </div>
+        <div class="patient-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <input
+            type="search"
+            [value]="patientSearchQuery()"
+            (input)="onPatientSearchChange($event)"
+            placeholder="Search patients…"
+            aria-label="Search patients"
+          />
+        </div>
+        <div class="patient-list">
+          @if (patientsLoading()) {
+            <p class="patient-list-status">Loading patients…</p>
+          } @else if (patientsError(); as message) {
+            <p class="patient-list-status is-error" role="alert">{{ message }}</p>
+            <button type="button" class="btn-text" (click)="loadPatients()">Retry</button>
+          } @else if (filteredPatients().length === 0) {
+            <div class="empty-state-compact">
+              <p class="empty-state-title">No patients found</p>
+              <p class="empty-state-hint">Patients from your appointments will appear here.</p>
+            </div>
+          } @else {
+            @for (patient of filteredPatients(); track patient.id) {
+              <button
+                type="button"
+                class="patient-item"
+                [class.selected]="selectedPatientId() === patient.id"
+                (click)="selectPatient(patient.id)"
+                [attr.aria-pressed]="selectedPatientId() === patient.id"
+              >
+                <span class="patient-avatar" aria-hidden="true">{{ patient.initials }}</span>
+                <span class="patient-name">{{ patient.name }}</span>
+              </button>
+            }
+          }
+        </div>
+      </aside>
+
+      <!-- Prescriptions + create form panel -->
+      <main class="prescriptions-main">
+        @if (!selectedPatient()) {
+          <div class="empty-state">
+            <span class="empty-state-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </span>
+            <p class="empty-state-title">Select a patient</p>
+            <p class="empty-state-hint">Choose a patient from the list to view their prescriptions or create a new one.</p>
+          </div>
+        } @else {
+          <div class="patient-prescriptions-view">
+            <div class="view-header">
+              <div class="selected-patient-info">
+                <span class="patient-avatar patient-avatar-lg" aria-hidden="true">{{ selectedPatient()!.initials }}</span>
+                <div>
+                  <h2 class="selected-patient-name">{{ selectedPatient()!.name }}</h2>
+                  <p class="selected-patient-hint">Prescription history for this patient</p>
+                </div>
+              </div>
+              <button type="button" class="btn btn-primary" (click)="showCreateForm.set(!showCreateForm())">
+                @if (showCreateForm()) {
+                  Cancel
+                } @else {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:16px;height:16px;">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  New Prescription
+                }
+              </button>
+            </div>
+
+            @if (submitSuccess(); as msg) {
+              <div class="dashboard-alert alert-success" role="alert">
+                <span class="alert-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </span>
+                <span class="alert-message">{{ msg }}</span>
+                <button type="button" class="alert-close" (click)="submitSuccess.set(null)" aria-label="Dismiss">&times;</button>
+              </div>
+            }
+            @if (submitError(); as msg) {
+              <div class="dashboard-alert alert-error" role="alert">
+                <span class="alert-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                </span>
+                <span class="alert-message">{{ msg }}</span>
+                <button type="button" class="alert-close" (click)="submitError.set(null)" aria-label="Dismiss">&times;</button>
+              </div>
+            }
+
+            @if (showCreateForm()) {
+              <form class="create-prescription-form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+                <h3 class="form-title">New Prescription</h3>
+                <p class="form-subtitle">Add one or more medications for {{ selectedPatient()!.name }}.</p>
+
+                <div class="medications-section">
+                  <div class="medications-header">
+                    <span class="medications-title">Medications</span>
+                    <button type="button" class="btn btn-secondary btn-sm" (click)="addMedication()">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px;">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                      Add medication
+                    </button>
+                  </div>
+
+                  <div class="medications-list">
+                    @for (medGroup of form.controls.medications.controls; track $index; let i = $index) {
+                      <div class="medication-form-card">
+                        <div class="medication-form-header">
+                          <span class="medication-index">Medication {{ i + 1 }}</span>
+                          @if (form.controls.medications.length > 1) {
+                            <button type="button" class="btn-remove-med" (click)="removeMedication(i)" aria-label="Remove medication {{ i + 1 }}">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px;">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                              </svg>
+                            </button>
+                          }
+                        </div>
+                        <div class="medication-form-grid">
+                          <div class="field" [class.has-error]="medicationFieldError(medGroup, 'medicationName')">
+                            <label class="label" for="med-name-{{ i }}">Medication name</label>
+                            <input id="med-name-{{ i }}" class="input" type="text" formControlName="medicationName" placeholder="e.g. Amoxicillin" />
+                            @if (medicationFieldError(medGroup, 'medicationName'); as msg) {
+                              <span class="field-error">{{ msg }}</span>
+                            }
+                          </div>
+                          <div class="field" [class.has-error]="medicationFieldError(medGroup, 'dosage')">
+                            <label class="label" for="med-dosage-{{ i }}">Dosage</label>
+                            <input id="med-dosage-{{ i }}" class="input" type="text" formControlName="dosage" placeholder="e.g. 500mg" />
+                            @if (medicationFieldError(medGroup, 'dosage'); as msg) {
+                              <span class="field-error">{{ msg }}</span>
+                            }
+                          </div>
+                          <div class="field" [class.has-error]="medicationFieldError(medGroup, 'frequency')">
+                            <label class="label" for="med-freq-{{ i }}">Frequency</label>
+                            <input id="med-freq-{{ i }}" class="input" type="text" formControlName="frequency" placeholder="e.g. 3 times daily" />
+                            @if (medicationFieldError(medGroup, 'frequency'); as msg) {
+                              <span class="field-error">{{ msg }}</span>
+                            }
+                          </div>
+                          <div class="field" [class.has-error]="medicationFieldError(medGroup, 'duration')">
+                            <label class="label" for="med-duration-{{ i }}">Duration</label>
+                            <input id="med-duration-{{ i }}" class="input" type="text" formControlName="duration" placeholder="e.g. 7 days" />
+                            @if (medicationFieldError(medGroup, 'duration'); as msg) {
+                              <span class="field-error">{{ msg }}</span>
+                            }
+                          </div>
+                          <div class="field field-full" [class.has-error]="medicationFieldError(medGroup, 'instructions')">
+                            <label class="label" for="med-instructions-{{ i }}">Instructions</label>
+                            <textarea id="med-instructions-{{ i }}" class="input textarea" rows="2" formControlName="instructions" placeholder="e.g. Take after meals"></textarea>
+                            @if (medicationFieldError(medGroup, 'instructions'); as msg) {
+                              <span class="field-error">{{ msg }}</span>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn btn-secondary" (click)="showCreateForm.set(false); resetCreateForm()">Cancel</button>
+                  <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+                    @if (submitting()) {
+                      <span class="btn-spinner" aria-hidden="true"></span> Creating…
+                    } @else {
+                      Create Prescription
+                    }
+                  </button>
+                </div>
+              </form>
+            }
+
+            <section class="prescriptions-section" aria-labelledby="history-title">
+              <div class="panel-header">
+                <div class="panel-heading">
+                  <h2 id="history-title">Prescription History</h2>
+                  @if (!prescriptionsLoading() && prescriptions().length > 0) {
+                    <span class="panel-count">{{ prescriptions().length }} total</span>
+                  }
+                </div>
+              </div>
+              <div class="panel-body">
+                @if (prescriptionsLoading()) {
+                  <p class="prescriptions-status" role="status">Loading prescriptions…</p>
+                } @else if (prescriptionsError(); as message) {
+                  <div class="dashboard-error" role="alert">
+                    <span class="dashboard-error-icon" aria-hidden="true">!</span>
+                    <span>{{ message }}</span>
+                    <button type="button" class="btn-text" (click)="loadPatientPrescriptions(selectedPatientId()!)">Retry</button>
+                  </div>
+                } @else if (prescriptions().length === 0) {
+                  <div class="empty-state">
+                    <span class="empty-state-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+                        <rect x="9" y="3" width="6" height="4" rx="1" />
+                        <path d="M9 12h6M9 16h4" />
+                      </svg>
+                    </span>
+                    <p class="empty-state-title">No prescriptions yet</p>
+                    <p class="empty-state-hint">Prescriptions written for this patient will appear here.</p>
+                  </div>
+                } @else {
+                  <div class="prescriptions-list">
+                    @for (prescription of prescriptions(); track prescription.id) {
+                      <div class="prescription-card">
+                        <div class="prescription-card-header" style="cursor:default;">
+                          <div class="prescription-card-main">
+                            <span class="prescription-icon" aria-hidden="true">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+                                <rect x="9" y="3" width="6" height="4" rx="1" />
+                                <path d="M9 12h6M9 16h4" />
+                              </svg>
+                            </span>
+                            <div class="prescription-card-info">
+                              <span class="prescription-doctor">Prescription #{{ prescription.id }}</span>
+                              <span class="prescription-date">{{ formatDate(prescription.creationDate) }}</span>
+                            </div>
+                          </div>
+                          <div class="prescription-card-meta">
+                            <span class="prescription-med-count">{{ prescription.medications.length }} medication{{ prescription.medications.length === 1 ? '' : 's' }}</span>
+                          </div>
+                        </div>
+                        <div class="prescription-card-body">
+                          <div class="medications-list">
+                            @for (med of prescription.medications; track med.id) {
+                              <div class="medication-item">
+                                <div class="medication-header">
+                                  <span class="medication-name">{{ med.medicationName }}</span>
+                                </div>
+                                <div class="medication-details">
+                                  <div class="medication-row">
+                                    <span class="medication-label">Dosage</span>
+                                    <span class="medication-value">{{ orDash(med.dosage) }}</span>
+                                  </div>
+                                  <div class="medication-row">
+                                    <span class="medication-label">Frequency</span>
+                                    <span class="medication-value">{{ orDash(med.frequency) }}</span>
+                                  </div>
+                                  <div class="medication-row">
+                                    <span class="medication-label">Duration</span>
+                                    <span class="medication-value">{{ orDash(med.duration) }}</span>
+                                  </div>
+                                  <div class="medication-row">
+                                    <span class="medication-label">Instructions</span>
+                                    <span class="medication-value">{{ orDash(med.instructions) }}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </section>
+          </div>
+        }
+      </main>
     </div>
   </section>
 </div>

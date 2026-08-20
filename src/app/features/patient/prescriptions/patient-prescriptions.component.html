@@ -3,17 +3,107 @@
     <h1>Prescriptions</h1>
     <p class="subtitle">View and manage your prescriptions.</p>
   </header>
-  <section class="dashboard-content">
-    <div class="empty-state">
-      <span class="empty-state-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-          <rect x="9" y="3" width="6" height="4" rx="1" />
-          <path d="M9 12h6M9 16h4" />
-        </svg>
-      </span>
-      <p class="empty-state-title">No prescriptions yet</p>
-      <p class="empty-state-hint">Prescriptions from your visits will appear here.</p>
-    </div>
+  <section class="dashboard-content" aria-label="Patient prescriptions">
+    @if (error(); as message) {
+      <div class="dashboard-error" role="alert">
+        <span class="dashboard-error-icon" aria-hidden="true">!</span>
+        <span>{{ message }}</span>
+        <button type="button" class="btn-text" (click)="loadPrescriptions()">Retry</button>
+      </div>
+    }
+    <section class="panel management-panel" aria-labelledby="prescriptions-section-title">
+      <header class="panel-header">
+        <div class="panel-heading">
+          <h2 id="prescriptions-section-title">My Prescriptions</h2>
+          @if (!loading() && prescriptions().length > 0) {
+            <span class="panel-count">{{ prescriptions().length }} total</span>
+          }
+        </div>
+      </header>
+      <div class="panel-body">
+        @if (loading()) {
+          <p class="prescriptions-status" role="status">Loading prescriptions…</p>
+        } @else if (prescriptions().length === 0) {
+          <div class="empty-state">
+            <span class="empty-state-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+                <rect x="9" y="3" width="6" height="4" rx="1" />
+                <path d="M9 12h6M9 16h4" />
+              </svg>
+            </span>
+            <p class="empty-state-title">No prescriptions yet</p>
+            <p class="empty-state-hint">Prescriptions from your visits will appear here.</p>
+          </div>
+        } @else {
+          <div class="prescriptions-list">
+            @for (prescription of prescriptions(); track prescription.id) {
+              <div class="prescription-card" [class.expanded]="expandedId() === prescription.id">
+                <button
+                  type="button"
+                  class="prescription-card-header"
+                  (click)="toggleExpand(prescription.id)"
+                  [attr.aria-expanded]="expandedId() === prescription.id"
+                  aria-controls="prescription-detail-{{ prescription.id }}"
+                >
+                  <div class="prescription-card-main">
+                    <span class="prescription-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+                        <rect x="9" y="3" width="6" height="4" rx="1" />
+                        <path d="M9 12h6M9 16h4" />
+                      </svg>
+                    </span>
+                    <div class="prescription-card-info">
+                      <span class="prescription-doctor">{{ prescription.doctorName }}</span>
+                      <span class="prescription-date">{{ formatDate(prescription.creationDate) }}</span>
+                    </div>
+                  </div>
+                  <div class="prescription-card-meta">
+                    <span class="prescription-med-count">{{ prescription.medications.length }} medication{{ prescription.medications.length === 1 ? '' : 's' }}</span>
+                    <span class="prescription-chevron" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </span>
+                  </div>
+                </button>
+                @if (expandedId() === prescription.id) {
+                  <div class="prescription-card-body" id="prescription-detail-{{ prescription.id }}">
+                    <div class="medications-list">
+                      @for (med of prescription.medications; track med.id) {
+                        <div class="medication-item">
+                          <div class="medication-header">
+                            <span class="medication-name">{{ med.medicationName }}</span>
+                          </div>
+                          <div class="medication-details">
+                            <div class="medication-row">
+                              <span class="medication-label">Dosage</span>
+                              <span class="medication-value">{{ orDash(med.dosage) }}</span>
+                            </div>
+                            <div class="medication-row">
+                              <span class="medication-label">Frequency</span>
+                              <span class="medication-value">{{ orDash(med.frequency) }}</span>
+                            </div>
+                            <div class="medication-row">
+                              <span class="medication-label">Duration</span>
+                              <span class="medication-value">{{ orDash(med.duration) }}</span>
+                            </div>
+                            <div class="medication-row">
+                              <span class="medication-label">Instructions</span>
+                              <span class="medication-value">{{ orDash(med.instructions) }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </section>
   </section>
 </div>

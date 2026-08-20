@@ -3,17 +3,104 @@
     <h1>Medical Reports</h1>
     <p class="subtitle">View your medical reports and test results.</p>
   </header>
-  <section class="dashboard-content">
-    <div class="empty-state">
-      <span class="empty-state-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <path d="M14 2v6h6" />
-          <path d="M16 13H8M16 17H8M10 9H8" />
-        </svg>
-      </span>
-      <p class="empty-state-title">No medical reports yet</p>
-      <p class="empty-state-hint">Reports from your visits will appear here.</p>
-    </div>
+  <section class="dashboard-content" aria-label="Patient medical reports">
+    @if (error(); as message) {
+      <div class="dashboard-error" role="alert">
+        <span class="dashboard-error-icon" aria-hidden="true">!</span>
+        <span>{{ message }}</span>
+        <button type="button" class="btn-text" (click)="loadReports()">Retry</button>
+      </div>
+    }
+    <section class="panel management-panel" aria-labelledby="reports-section-title">
+      <header class="panel-header">
+        <div class="panel-heading">
+          <h2 id="reports-section-title">My Reports</h2>
+          @if (!loading() && reports().length > 0) {
+            <span class="panel-count">{{ reports().length }} total</span>
+          }
+        </div>
+      </header>
+      <div class="panel-body">
+        @if (loading()) {
+          <p class="reports-status" role="status">Loading medical reports…</p>
+        } @else if (reports().length === 0) {
+          <div class="empty-state">
+            <span class="empty-state-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <path d="M14 2v6h6" />
+                <path d="M16 13H8M16 17H8M10 9H8" />
+              </svg>
+            </span>
+            <p class="empty-state-title">No medical reports yet</p>
+            <p class="empty-state-hint">Reports from your visits will appear here.</p>
+          </div>
+        } @else {
+          <div class="reports-list">
+            @for (report of reports(); track report.id) {
+              <div class="report-card" [class.expanded]="expandedId() === report.id">
+                <button
+                  type="button"
+                  class="report-card-header"
+                  (click)="toggleExpand(report.id)"
+                  [attr.aria-expanded]="expandedId() === report.id"
+                  aria-controls="report-detail-{{ report.id }}"
+                >
+                  <div class="report-card-main">
+                    <span class="report-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <path d="M14 2v6h6" />
+                        <path d="M16 13H8M16 17H8M10 9H8" />
+                      </svg>
+                    </span>
+                    <div class="report-card-info">
+                      <span class="report-doctor">{{ report.doctorName }}</span>
+                      <span class="report-date">{{ formatDate(report.reportDate) }}</span>
+                    </div>
+                  </div>
+                  <div class="report-card-meta">
+                    <span class="report-diagnosis-pill">{{ report.diagnosis }}</span>
+                    <span class="report-chevron" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </span>
+                  </div>
+                </button>
+                @if (expandedId() === report.id) {
+                  <div class="report-card-body" id="report-detail-{{ report.id }}">
+                    <div class="report-details">
+                      @if (report.appointmentDate) {
+                        <div class="report-row">
+                          <span class="report-label">Appointment Date</span>
+                          <span class="report-value">{{ formatDate(report.appointmentDate) }}</span>
+                        </div>
+                      }
+                      <div class="report-row">
+                        <span class="report-label">Diagnosis</span>
+                        <span class="report-value">{{ report.diagnosis }}</span>
+                      </div>
+                      @if (report.symptoms) {
+                        <div class="report-row">
+                          <span class="report-label">Symptoms</span>
+                          <span class="report-value">{{ report.symptoms }}</span>
+                        </div>
+                      }
+                      @if (report.notes) {
+                        <div class="report-row">
+                          <span class="report-label">Notes</span>
+                          <span class="report-value">{{ report.notes }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </section>
   </section>
 </div>
