@@ -29,6 +29,18 @@
   font-weight: 600;
   color: var(--clini-slate-900);
 }
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1rem;
+}
+.panel-count {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--clini-slate-500);
+  margin-top: 0.148rem;
+}
 .patient-search {
   display: flex;
   align-items: center;
