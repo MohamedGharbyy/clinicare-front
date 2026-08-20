@@ -79,7 +79,7 @@
                   <p class="selected-patient-hint">Prescription history for this patient</p>
                 </div>
               </div>
-              <button type="button" class="btn btn-primary" (click)="showCreateForm.set(!showCreateForm())">
+              <button type="button" class="btn btn-primary" (click)="toggleCreateForm()">
                 @if (showCreateForm()) {
                   Cancel
                 } @else {
@@ -134,9 +134,9 @@
                     </button>
                   </div>
 
-                  <div class="medications-list">
+                  <div class="medications-list" formArrayName="medications">
                     @for (medGroup of form.controls.medications.controls; track $index; let i = $index) {
-                      <div class="medication-form-card">
+                      <div class="medication-form-card" [formGroupName]="i">
                         <div class="medication-form-header">
                           <span class="medication-index">Medication {{ i + 1 }}</span>
                           @if (form.controls.medications.length > 1) {

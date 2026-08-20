@@ -111,6 +111,7 @@ export class DoctorPrescriptionsComponent {
 
   selectPatient(patientId: number): void {
     this.selectedPatientId.set(patientId);
+    this.form.controls.patientId.setValue(patientId);
     this.prescriptions.set([]);
     this.prescriptionsError.set(null);
     this.loadPatientPrescriptions(patientId);
@@ -126,6 +127,16 @@ export class DoctorPrescriptionsComponent {
         next: (list) => this.prescriptions.set(list),
         error: () => this.prescriptionsError.set('Could not load prescriptions for this patient. Please try again.'),
       });
+  }
+
+  toggleCreateForm(): void {
+    const next = !this.showCreateForm();
+    this.showCreateForm.set(next);
+    this.submitSuccess.set(null);
+    this.submitError.set(null);
+    if (next && this.selectedPatientId() !== null) {
+      this.form.controls.patientId.setValue(this.selectedPatientId());
+    }
   }
 
   addMedication(): void {
