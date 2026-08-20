@@ -1,4 +1,4 @@
-@import '../../../layout/dashboard-page.scss';
+@use '../../../layout/dashboard-page' as *;
 
 .dashboard-content {
   display: flex;
