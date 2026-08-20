@@ -1,0 +1,108 @@
+<div class="dashboard-page">
+  <header class="page-header">
+    <div class="header-main">
+      <div>
+        <h1>Doctors</h1>
+        <p class="subtitle">View and manage registered doctors.</p>
+      </div>
+      @if (refreshLabel()) {
+        <span class="last-refreshed-badge">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          Updated {{ refreshLabel() }}
+        </span>
+      }
+    </div>
+  </header>
+  <section class="dashboard-content" aria-label="Doctors management">
+    @if (error(); as message) {
+      <div class="dashboard-error" role="alert">
+        <span class="dashboard-error-icon" aria-hidden="true">!</span>
+        <span>{{ message }}</span>
+        <button type="button" class="btn-text" (click)="load()">Retry</button>
+      </div>
+    }
+    <section class="panel management-panel" aria-labelledby="doctors-section-title">
+      <header class="panel-header">
+        <div class="panel-heading">
+          <h2 id="doctors-section-title">Doctors</h2>
+          @if (!loading() && doctors().length > 0) {
+            <span class="panel-count">{{ doctors().length }} registered</span>
+          }
+        </div>
+        <label class="filter-field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <input
+            type="search"
+            [value]="doctorsFilter()"
+            (input)="onDoctorsFilterChange($event)"
+            placeholder="Search doctors by name, email, specialty, or license…"
+            aria-label="Search doctors"
+          />
+        </label>
+      </header>
+      <div class="panel-body">
+        @if (loading()) {
+          <p class="appointments-status" role="status">Loading doctors…</p>
+        } @else if (doctors().length === 0) {
+          <div class="empty-state">
+            <span class="empty-state-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+                <path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z" />
+                <path d="M12 8v6M9 11h6" />
+              </svg>
+            </span>
+            <p class="empty-state-title">No doctors registered yet</p>
+            <p class="empty-state-hint">Doctor accounts will appear here once they sign up.</p>
+          </div>
+        } @else if (filteredDoctors().length === 0) {
+          <div class="empty-state">
+            <span class="empty-state-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </span>
+            <p class="empty-state-title">No matching doctors</p>
+            <p class="empty-state-hint">Try a different name, email, specialty, or license number.</p>
+          </div>
+        } @else {
+          <div class="table-scroll">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th scope="col">Doctor</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Specialty</th>
+                  <th scope="col">License</th>
+                  <th scope="col">Phone</th>
+                  <th scope="col">Registered</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (doctor of filteredDoctors(); track doctor.id) {
+                  <tr>
+                    <td data-label="Doctor">
+                      <span class="person-cell">
+                        <span class="person-avatar" aria-hidden="true">{{ doctorInitials(doctor.name) }}</span>
+                        <span class="person-name">{{ doctor.name | doctorName }}</span>
+                      </span>
+                    </td>
+                    <td data-label="Email">{{ doctor.email }}</td>
+                    <td data-label="Specialty">{{ orDash(doctor.specialty) }}</td>
+                    <td data-label="License">{{ orDash(doctor.licenseNumber) }}</td>
+                    <td data-label="Phone">{{ orDash(doctor.phoneNumber) }}</td>
+                    <td data-label="Registered">{{ registeredAt(doctor.registeredAt) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </section>
+  </section>
+</div>

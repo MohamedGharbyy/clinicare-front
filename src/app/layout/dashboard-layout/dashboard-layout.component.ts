@@ -6,7 +6,6 @@ import { AuthService } from '../../auth/auth.service';
 import { normalizeRole } from '../../auth/jwt.utils';
 import type { UserRole } from '../../auth/auth.models';
 
-/** Icon keys rendered by the shared sidebar icon template. */
 type NavIcon =
   | 'dashboard'
   | 'appointments'
@@ -17,35 +16,23 @@ type NavIcon =
   | 'messages'
   | 'settings';
 
-/** A single entry in the role-specific sidebar. */
 interface DashboardNavItem {
   label: string;
   icon: NavIcon;
-  /**
-   * Router URL the item navigates to. When absent the entry is a
-   * "coming soon" placeholder (no route exists for it yet).
-   */
   route?: string;
 }
 
-/** A labelled group of sidebar entries. */
 interface DashboardNavSection {
   label: string;
   items: DashboardNavItem[];
 }
 
-/** Home page of each role — where the brand and avatar link. */
 const ROLE_DASHBOARD_URL: Record<UserRole, string> = {
   PATIENT: '/patient/dashboard',
   DOCTOR: '/doctor/dashboard',
   ADMIN: '/admin/dashboard',
 };
 
-/**
- * Sidebar structure per role. Only the dashboard entry has a live route today;
- * the remaining items describe the app's planned feature areas and are shown
- * as disabled placeholders until those pages exist.
- */
 const NAV_BY_ROLE: Record<UserRole, DashboardNavSection[]> = {
   PATIENT: [
     {
@@ -55,37 +42,33 @@ const NAV_BY_ROLE: Record<UserRole, DashboardNavSection[]> = {
     {
       label: 'Care',
       items: [
-        { label: 'Appointments', icon: 'appointments' },
-        { label: 'Medical records', icon: 'records' },
-        { label: 'Prescriptions', icon: 'prescriptions' },
-        { label: 'Messages', icon: 'messages' },
+        { label: 'Appointments', icon: 'appointments', route: '/patient/appointments' },
+        { label: 'Medical reports', icon: 'records', route: '/patient/medical-reports' },
+        { label: 'Prescriptions', icon: 'prescriptions', route: '/patient/prescriptions' },
       ],
     },
     {
       label: 'Account',
-      items: [{ label: 'Profile & settings', icon: 'settings' }],
+      items: [{ label: 'Profile & settings', icon: 'settings', route: '/patient/profile' }],
     },
   ],
   DOCTOR: [
     {
       label: 'Menu',
-      items: [
-        { label: 'Dashboard', icon: 'dashboard', route: '/doctor/dashboard' },
-        { label: 'Schedule', icon: 'schedule' },
-      ],
+      items: [{ label: 'Dashboard', icon: 'dashboard', route: '/doctor/dashboard' }],
     },
     {
       label: 'Practice',
       items: [
-        { label: 'Patients', icon: 'users' },
-        { label: 'Appointments', icon: 'appointments' },
-        { label: 'Medical records', icon: 'records' },
-        { label: 'Messages', icon: 'messages' },
+        { label: 'Patients', icon: 'users', route: '/doctor/patients' },
+        { label: 'Appointments', icon: 'appointments', route: '/doctor/appointments' },
+        { label: 'Medical reports', icon: 'records', route: '/doctor/medical-reports' },
+        { label: 'Prescriptions', icon: 'prescriptions', route: '/doctor/prescriptions' },
       ],
     },
     {
       label: 'Account',
-      items: [{ label: 'Profile & settings', icon: 'settings' }],
+      items: [{ label: 'Profile & settings', icon: 'settings', route: '/doctor/profile' }],
     },
   ],
   ADMIN: [
@@ -96,24 +79,18 @@ const NAV_BY_ROLE: Record<UserRole, DashboardNavSection[]> = {
     {
       label: 'Management',
       items: [
-        { label: 'Users', icon: 'users' },
-        { label: 'Doctors', icon: 'users' },
-        { label: 'Patients', icon: 'users' },
-        { label: 'Appointments', icon: 'appointments' },
+        { label: 'Patients', icon: 'users', route: '/admin/patients' },
+        { label: 'Doctors', icon: 'users', route: '/admin/doctors' },
+        { label: 'Appointments', icon: 'appointments', route: '/admin/appointments' },
       ],
     },
     {
-      label: 'System',
-      items: [{ label: 'Settings', icon: 'settings' }],
+      label: 'Account',
+      items: [{ label: 'Profile & settings', icon: 'settings', route: '/admin/profile' }],
     },
   ],
 };
 
-/**
- * Dashboard shell shared by every role: a clean top navbar, a role-aware
- * left sidebar and a routed main area. The routed children (the role
- * dashboards) render inside {@link main}.
- */
 @Component({
   selector: 'app-dashboard-layout',
   imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet],
@@ -124,31 +101,24 @@ export class DashboardLayoutComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  /** Current authenticated user (null when logged out). */
   readonly user = this.authService.user;
-
-  /** Sidebar visibility on small screens (off-canvas drawer). */
   readonly sidebarOpen = signal(false);
 
-  /** Sidebar groups for the signed-in user's role. */
   readonly navSections = computed<DashboardNavSection[]>(() => {
     const role = normalizeRole(this.user()?.role);
     return role ? NAV_BY_ROLE[role] : [];
   });
 
-  /** Where the brand links — always the user's own dashboard. */
   readonly dashboardUrl = computed(() => {
     const role = normalizeRole(this.user()?.role);
     return role ? ROLE_DASHBOARD_URL[role] : '/login';
   });
 
-  /** Two-letter monogram shown in the navbar avatar. */
   readonly initials = computed(() => {
     const localPart = (this.user()?.email ?? '').split('@')[0] ?? '';
     return localPart.slice(0, 2).toUpperCase();
   });
 
-  /** Human-friendly role label for the navbar chip. */
   readonly roleLabel = computed(() => {
     switch (normalizeRole(this.user()?.role)) {
       case 'ADMIN':

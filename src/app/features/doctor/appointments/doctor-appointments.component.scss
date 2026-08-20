@@ -36,6 +36,11 @@
   &:hover { color: var(--clini-blue-700); background: var(--clini-blue-50); border-color: var(--clini-blue-100); }
 }
 
+.request-error {
+  margin: 0 0 0.75rem; padding: 0.7rem 0.9rem; border: 1px solid var(--clini-danger-600); border-radius: 10px;
+  font-size: 0.8rem; color: var(--clini-danger-600); background: var(--clini-danger-100);
+}
+
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; }
 .stat-card {
   display: flex; align-items: center; gap: 1rem; padding: 1.25rem; background: #ffffff; border: 1px solid var(--clini-slate-200);
@@ -52,15 +57,11 @@
 .panels-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; }
 .panel { background: #ffffff; border: 1px solid var(--clini-slate-200); border-radius: 18px; box-shadow: var(--clini-shadow-card); }
 .panel-header {
-  display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 1.25rem 1.5rem 0;
+  display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; padding: 1.25rem 1.5rem 0;
   h2 { margin: 0; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; color: var(--clini-slate-900); }
-}
-.panel-link {
-  font-size: 0.8rem; font-weight: 600; color: var(--clini-blue-600); text-decoration: none;
-  &:hover { color: var(--clini-blue-700); text-decoration: underline; }
+  .panel-count { font-size: 0.75rem; font-weight: 600; color: var(--clini-slate-500); }
 }
 .panel-body { padding: 1.5rem; }
-
 .appointments-status {
   margin: 0; padding: 1.25rem; text-align: center; font-size: 0.9rem; color: var(--clini-slate-500);
   background: var(--clini-slate-50); border: 1px dashed var(--clini-slate-300); border-radius: 14px;
@@ -77,34 +78,49 @@
 .empty-state-title { margin: 0; font-size: 0.9rem; font-weight: 600; color: var(--clini-slate-700); }
 .empty-state-hint { margin: 0.25rem 0 0; font-size: 0.8rem; color: var(--clini-slate-400); }
 
-.appointment-slot {
-  display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1.25rem;
-  background: var(--clini-blue-50); border: 1px solid var(--clini-blue-100); border-radius: 14px;
+.appointment-list { display: flex; flex-direction: column; gap: 0.75rem; margin: 0; padding: 0; list-style: none; }
+.appointment-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.appointment-main { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
+.patient-avatar {
+  display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: 0 0 auto;
+  font-size: 0.8rem; font-weight: 600; color: var(--clini-blue-700); background: var(--clini-blue-50); border-radius: 10px;
 }
-.slot-details { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
-.slot-patient { font-size: 1rem; font-weight: 600; color: var(--clini-slate-900); }
-.slot-reason { font-size: 0.85rem; color: var(--clini-blue-700); }
-.slot-time { margin-top: 0.5rem; font-size: 0.85rem; color: var(--clini-slate-500); }
+.appointment-meta { display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+.patient-name { font-size: 0.95rem; font-weight: 600; color: var(--clini-slate-900); }
+.appointment-reason { margin-top: 0.1rem; max-width: 100%; font-size: 0.8rem; color: var(--clini-slate-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.appointment-side { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; flex: 0 0 auto; text-align: right; }
+.appointment-time { font-size: 0.82rem; font-weight: 500; color: var(--clini-slate-700); }
+
 .status-pill {
-  flex: 0 0 auto; padding: 0.25rem 0.65rem; border-radius: 999px; font-size: 0.7rem; font-weight: 600;
-  letter-spacing: 0.03em; text-transform: uppercase; background: #ffffff; color: var(--clini-slate-500); border: 1px solid var(--clini-slate-300);
-  &:not(.is-pending):not(.is-confirmed):not(.is-completed):not(.is-negative) { background: #fff; color: var(--clini-slate-500); border: 1px solid var(--clini-slate-300); }
+  padding: 0.25rem 0.7rem; border-radius: 999px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em;
+  text-transform: uppercase; white-space: nowrap;
+  &:not(.is-pending):not(.is-confirmed):not(.is-completed):not(.is-negative) { background: #ffffff; color: var(--clini-slate-500); border: 1px solid var(--clini-slate-300); }
 }
-.status-pill.is-pending { background: var(--clini-blue-50); color: var(--clini-blue-700); border-color: var(--clini-blue-100); }
+.status-pill.is-pending { background: var(--clini-blue-50); color: var(--clini-blue-700); border: 1px solid var(--clini-blue-100); }
 .status-pill.is-confirmed { background: var(--clini-success-100); color: var(--clini-success-600); }
 .status-pill.is-completed { background: var(--clini-slate-100); color: var(--clini-slate-700); }
 .status-pill.is-negative { background: var(--clini-danger-100); color: var(--clini-danger-600); }
 
-.quick-actions { display: flex; flex-direction: column; gap: 0.75rem; }
-.quick-action-btn {
-  display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.25rem; background: #ffffff; border: 1px solid var(--clini-slate-200);
-  border-radius: 14px; color: var(--clini-slate-700); text-decoration: none; font-size: 0.95rem; font-weight: 600;
-  transition: background 0.15s ease, border-color 0.15s ease;
-  svg { width: 22px; height: 22px; flex: 0 0 auto; color: var(--clini-blue-700); }
-  &:hover { background: var(--clini-blue-50); border-color: var(--clini-blue-100); color: var(--clini-blue-700); }
+.request-list { display: flex; flex-direction: column; gap: 0.75rem; margin: 0; padding: 0; list-style: none; }
+.request-card { display: flex; flex-direction: column; gap: 0.35rem; padding: 0.9rem 1rem; background: #ffffff; border: 1px solid var(--clini-slate-200); border-radius: 14px; }
+.request-main { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
+.request-meta { display: flex; flex-direction: column; min-width: 0; }
+.request-slot { margin-top: 0.1rem; font-size: 0.8rem; font-weight: 500; color: var(--clini-slate-500); }
+.request-fields { display: flex; flex-direction: column; gap: 0.3rem; margin: 0.35rem 0 0; }
+.request-field { display: flex; gap: 0.5rem; font-size: 0.85rem; dt { flex: 0 0 auto; min-width: 4rem; font-weight: 600; color: var(--clini-slate-500); } dd { min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--clini-slate-700); } }
+.request-actions { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
+.request-btn {
+  flex: 1; padding: 0.5rem 0.9rem; font-size: 0.8rem; font-weight: 600; border-radius: 9px; cursor: pointer; border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  &:disabled { opacity: 0.6; cursor: default; }
 }
+.request-btn.request-accept { color: #ffffff; background: var(--clini-success-600); border-color: var(--clini-success-600); &:hover:not(:disabled) { background: #128a3e; } }
+.request-btn.request-reject { color: var(--clini-danger-600); background: transparent; border-color: var(--clini-danger-600); &:hover:not(:disabled) { background: var(--clini-danger-100); } }
 
 @media (max-width: 640px) {
   .stats-grid { grid-template-columns: 1fr; }
   .panels-grid { grid-template-columns: 1fr; }
+  .request-actions { flex-direction: column; }
+  .appointment-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  .appointment-side { flex-direction: row; align-items: center; justify-content: space-between; width: 100%; text-align: left; }
 }

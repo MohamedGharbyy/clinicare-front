@@ -1,0 +1,105 @@
+<div class="dashboard-page">
+  <header class="page-header">
+    <div class="header-main">
+      <div>
+        <h1>Patients</h1>
+        <p class="subtitle">View and manage registered patients.</p>
+      </div>
+      @if (refreshLabel()) {
+        <span class="last-refreshed-badge">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          Updated {{ refreshLabel() }}
+        </span>
+      }
+    </div>
+  </header>
+  <section class="dashboard-content" aria-label="Patients management">
+    @if (error(); as message) {
+      <div class="dashboard-error" role="alert">
+        <span class="dashboard-error-icon" aria-hidden="true">!</span>
+        <span>{{ message }}</span>
+        <button type="button" class="btn-text" (click)="load()">Retry</button>
+      </div>
+    }
+    <section class="panel management-panel" aria-labelledby="patients-section-title">
+      <header class="panel-header">
+        <div class="panel-heading">
+          <h2 id="patients-section-title">Patients</h2>
+          @if (!loading() && patients().length > 0) {
+            <span class="panel-count">{{ patients().length }} registered</span>
+          }
+        </div>
+        <label class="filter-field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <input
+            type="search"
+            [value]="patientsFilter()"
+            (input)="onPatientsFilterChange($event)"
+            placeholder="Search patients by name, email, or phone…"
+            aria-label="Search patients"
+          />
+        </label>
+      </header>
+      <div class="panel-body">
+        @if (loading()) {
+          <p class="appointments-status" role="status">Loading patients…</p>
+        } @else if (patients().length === 0) {
+          <div class="empty-state">
+            <span class="empty-state-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+              </svg>
+            </span>
+            <p class="empty-state-title">No patients registered yet</p>
+            <p class="empty-state-hint">Patient accounts will appear here once they sign up.</p>
+          </div>
+        } @else if (filteredPatients().length === 0) {
+          <div class="empty-state">
+            <span class="empty-state-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </span>
+            <p class="empty-state-title">No matching patients</p>
+            <p class="empty-state-hint">Try a different name, email, or phone number.</p>
+          </div>
+        } @else {
+          <div class="table-scroll">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th scope="col">Patient</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Date of birth</th>
+                  <th scope="col">Phone</th>
+                  <th scope="col">Registered</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (patient of filteredPatients(); track patient.id) {
+                  <tr>
+                    <td data-label="Patient">
+                      <span class="person-cell">
+                        <span class="person-avatar" aria-hidden="true">{{ patientInitials(patient.name) }}</span>
+                        <span class="person-name">{{ patient.name }}</span>
+                      </span>
+                    </td>
+                    <td data-label="Email">{{ patient.email }}</td>
+                    <td data-label="Date of birth">{{ birthDate(patient.dateOfBirth) }}</td>
+                    <td data-label="Phone">{{ orDash(patient.phoneNumber) }}</td>
+                    <td data-label="Registered">{{ registeredAt(patient.registeredAt) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </section>
+  </section>
+</div>
