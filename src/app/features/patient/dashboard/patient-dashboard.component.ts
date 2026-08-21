@@ -91,7 +91,7 @@ export class PatientDashboardComponent {
       .subscribe({
         next: ({ all, upcoming, prescriptions, reports }) => {
           this.appointments.set(all);
-          this.upcomingAppointments.set(upcoming);
+          this.upcomingAppointments.set(upcoming.filter((a) => a.status === 'CONFIRMED'));
           this.recentActivities.set(this.buildActivities(all, prescriptions, reports));
         },
         error: () => {

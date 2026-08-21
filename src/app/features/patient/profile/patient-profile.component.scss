@@ -1,8 +1,344 @@
-@use '../../../layout/dashboard-page' as *;
+/* ==========================================================================
+   Patient · Profile & settings
+   Three clearly separated account sections (personal information, password,
+   account). Follows the CliniCare design system: brand blue #38B6FF, slate
+   neutrals, 18px cards, the shared page scaffolding, and the same form
+   controls used across the patient dashboard.
+   ========================================================================== */
 
-.dashboard-content {
-  display: block;
+:host .dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-height: 0;
   background: transparent;
   border: 0;
   border-radius: 0;
+}
+
+/* ---- Section card -------------------------------------------------------- */
+.section-card {
+  background: #ffffff;
+  border: 1px solid var(--clini-slate-200);
+  border-radius: 18px;
+  box-shadow: var(--clini-shadow-card);
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--clini-slate-100);
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--clini-blue-50);
+  color: var(--clini-blue-700);
+
+  svg {
+    width: 21px;
+    height: 21px;
+  }
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--clini-slate-900);
+}
+
+.section-desc {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  color: var(--clini-slate-500);
+}
+
+.section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem;
+}
+
+/* ---- Read-only summary --------------------------------------------------- */
+.summary {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--clini-slate-100);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.summary dt {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--clini-slate-500);
+}
+
+.summary dd {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--clini-slate-900);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: var(--clini-blue-50);
+  color: var(--clini-blue-700);
+  border: 1px solid var(--clini-blue-100);
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--clini-slate-400);
+}
+
+/* ---- Form fields (mirrors the appointment booking form) ------------------ */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--clini-slate-700);
+}
+
+.optional {
+  font-weight: 400;
+  color: var(--clini-slate-400);
+}
+
+.input {
+  width: 100%;
+  font: inherit;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--clini-slate-300);
+  border-radius: 10px;
+  background: var(--clini-slate-50);
+  color: var(--clini-slate-900);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #38b6ff;
+    box-shadow: 0 0 0 3px rgba(56, 182, 255, 0.18);
+    background: #ffffff;
+  }
+
+  &::placeholder {
+    color: var(--clini-slate-400);
+  }
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.field.has-error .input {
+  border-color: var(--clini-danger-600);
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+  }
+}
+
+.field-error {
+  font-size: 0.8rem;
+  color: var(--clini-danger-600);
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* ---- Buttons ------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 0.7rem 1.2rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.05s ease;
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.99);
+  }
+}
+
+.btn-primary {
+  background: var(--clini-blue-600);
+  color: #ffffff;
+  box-shadow: 0 12px 24px -12px rgba(56, 182, 255, 0.65);
+
+  &:hover:not(:disabled) {
+    background: #1fa8ff;
+  }
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--clini-slate-700);
+  border-color: var(--clini-slate-300);
+
+  &:hover:not(:disabled) {
+    background: var(--clini-slate-50);
+    border-color: var(--clini-slate-400);
+  }
+}
+
+.btn-secondary {
+  background: var(--clini-slate-100);
+  color: var(--clini-slate-700);
+
+  &:hover:not(:disabled) {
+    background: var(--clini-slate-200);
+  }
+}
+
+/* ---- Alerts -------------------------------------------------------------- */
+.alert {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.alert-success {
+  background: var(--clini-success-100);
+  color: var(--clini-success-600);
+}
+
+.alert-error {
+  background: var(--clini-danger-100);
+  color: var(--clini-danger-600);
+}
+
+/* ---- Spinner ------------------------------------------------------------- */
+.spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: clini-spin 0.7s linear infinite;
+}
+
+@keyframes clini-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- Loading / error state ----------------------------------------------- */
+.state-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 240px;
+  padding: 1.5rem;
+  text-align: center;
+  background: var(--clini-slate-50);
+  border: 1px dashed var(--clini-slate-300);
+  border-radius: 14px;
+}
+
+.state-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--clini-slate-500);
+
+  &.state-error {
+    color: var(--clini-danger-600);
+  }
+}
+
+@media (max-width: 560px) {
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+
+    .btn {
+      width: 100%;
+    }
+  }
 }

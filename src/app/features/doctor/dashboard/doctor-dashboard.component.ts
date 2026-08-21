@@ -103,7 +103,9 @@ export class DoctorDashboardComponent {
       .sort((a, b) => toLocalDateTime(a).getTime() - toLocalDateTime(b).getTime()),
   );
 
-  readonly nextUpcomingAppointment = computed(() => this.upcomingAppointments()[0] ?? null);
+  readonly nextUpcomingAppointment = computed(
+    () => this.upcomingAppointments().filter((a) => a.status === 'CONFIRMED')[0] ?? null,
+  );
 
   readonly upcomingAppointmentLabel = computed(() => {
     const appointment = this.nextUpcomingAppointment();

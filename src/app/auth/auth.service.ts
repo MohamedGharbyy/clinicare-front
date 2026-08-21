@@ -11,6 +11,7 @@ import type {
   LoginRequest,
   RegisterRequest,
   RegisterResponse,
+  UserInfo,
 } from './auth.models';
 import { TOKEN_STORAGE } from './token.storage';
 import { isJwtExpired, isValidUserInfo } from './jwt.utils';
@@ -78,6 +79,15 @@ export class AuthService {
   logout(): void {
     this.storage.clear();
     this.authState.set({ token: null, user: null });
+  }
+
+  /**
+   * Replaces the active session (token + user info) without requiring a fresh
+   * login. Used after a profile update that re-issues the JWT, e.g. when the
+   * patient changes their login email.
+   */
+  setSession(token: string, user: UserInfo): void {
+    this.persistState({ token, user });
   }
 
   /** Helper to check token expiration. */
