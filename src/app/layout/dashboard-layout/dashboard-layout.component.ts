@@ -86,7 +86,7 @@ const NAV_BY_ROLE: Record<UserRole, DashboardNavSection[]> = {
     },
     {
       label: 'Account',
-      items: [{ label: 'Profile & settings', icon: 'settings', route: '/admin/profile' }],
+      items: [{ label: 'User Management', icon: 'users', route: '/admin/users' }],
     },
   ],
 };

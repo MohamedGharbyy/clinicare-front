@@ -38,6 +38,31 @@ export interface AdminDoctor {
   registeredAt: string;
 }
 
+/** Lifecycle state of a managed account. */
+export type AccountStatus = 'ACTIVE' | 'DISABLED' | 'BANNED' | 'DELETED';
+
+/** Admin-facing managed account (PATIENT or DOCTOR). */
+export interface AdminUser {
+  /** Linked {@code users.id}. */
+  id: number;
+  name: string;
+  email: string;
+  role: 'PATIENT' | 'DOCTOR';
+  status: AccountStatus;
+  /** ISO date-time when a temporary ban lifts, or null. */
+  banExpiresAt: string | null;
+  /** ISO date-time of registration. */
+  registeredAt: string;
+  specialty: string | null;
+  phoneNumber: string | null;
+  /** ISO date-time of the soft delete, present when {@code status === 'DELETED'}. */
+  deletedAt: string | null;
+  /** Id of the Admin who deleted the account, when soft-deleted. */
+  deletedById: number | null;
+  /** Email of the deleting Admin, resolved for display. */
+  deletedByEmail: string | null;
+}
+
 /**
  * Client for the admin dashboard API. Every endpoint is read-only and the
  * backend enforces the ADMIN role, so only a signed-in admin can load data.
@@ -68,6 +93,37 @@ export class AdminService {
    */
   getAppointments(): Observable<Appointment[]> {
     return this.http.get<Appointment[]>(`${API_BASE_URL}/api/admin/appointments`);
+  }
+
+  /**
+   * Returns every managed PATIENT/DOCTOR account. Deleted accounts are excluded
+   * unless {@code includeDeleted} is set.
+   */
+  getUsers(includeDeleted = false): Observable<AdminUser[]> {
+    const params = includeDeleted ? '?includeDeleted=true' : '';
+    return this.http.get<AdminUser[]>(`${API_BASE_URL}/api/admin/users${params}`);
+  }
+
+  /** Soft-deletes an account (cannot log in, hidden from the active list). */
+  deleteUser(userId: number): Observable<void> {
+    return this.http.delete<void>(`${API_BASE_URL}/api/admin/users/${userId}`);
+  }
+
+  /** Disables an account so the user cannot log in until re-enabled. */
+  disableUser(userId: number): Observable<AdminUser> {
+    return this.http.post<AdminUser>(`${API_BASE_URL}/api/admin/users/${userId}/disable`, {});
+  }
+
+  /** Re-enables a disabled account. */
+  enableUser(userId: number): Observable<AdminUser> {
+    return this.http.post<AdminUser>(`${API_BASE_URL}/api/admin/users/${userId}/enable`, {});
+  }
+
+  /** Temporarily bans an account for the given number of days. */
+  banUser(userId: number, durationDays: number): Observable<AdminUser> {
+    return this.http.post<AdminUser>(`${API_BASE_URL}/api/admin/users/${userId}/ban`, {
+      durationDays,
+    });
   }
 
   /**

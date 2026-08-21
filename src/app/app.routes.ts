@@ -18,7 +18,7 @@ import { AdminDashboardComponent } from './features/admin/dashboard/admin-dashbo
 import { AdminPatientsComponent } from './features/admin/patients/admin-patients.component';
 import { AdminDoctorsComponent } from './features/admin/doctors/admin-doctors.component';
 import { AdminAppointmentsComponent } from './features/admin/appointments/admin-appointments.component';
-import { AdminProfileComponent } from './features/admin/profile/admin-profile.component';
+import { AdminUserManagementComponent } from './features/admin/user-management/user-management.component';
 import { DashboardLayoutComponent } from './layout/dashboard-layout/dashboard-layout.component';
 import { authGuard } from './core/guards/auth.guard';
 import { loginGuard } from './core/guards/login.guard';
@@ -66,7 +66,7 @@ export const routes: Routes = [
       { path: 'patients', component: AdminPatientsComponent },
       { path: 'doctors', component: AdminDoctorsComponent },
       { path: 'appointments', component: AdminAppointmentsComponent },
-      { path: 'profile', component: AdminProfileComponent },
+      { path: 'users', component: AdminUserManagementComponent },
     ],
   },
   { path: '**', redirectTo: 'login' },

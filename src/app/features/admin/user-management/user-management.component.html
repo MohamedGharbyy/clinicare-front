@@ -1,0 +1,285 @@
+<div class="dashboard-page">
+  <header class="page-header">
+    <div class="header-main">
+      <div>
+        <h1>User Management</h1>
+        <p class="subtitle">Manage patient and doctor accounts, status, and access.</p>
+      </div>
+      @if (refreshLabel()) {
+        <span class="last-refreshed-badge">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          Updated {{ refreshLabel() }}
+        </span>
+      }
+    </div>
+  </header>
+
+  <section class="dashboard-content" aria-label="User management">
+    @if (actionSuccess(); as msg) {
+      <div class="dashboard-alert alert-success" role="alert">
+        <span class="alert-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </span>
+        <span class="alert-message">{{ msg }}</span>
+        <button type="button" class="alert-close" (click)="dismissSuccess()" aria-label="Dismiss notification">&times;</button>
+      </div>
+    }
+    @if (actionError(); as msg) {
+      <div class="dashboard-alert alert-error" role="alert">
+        <span class="alert-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </span>
+        <span class="alert-message">{{ msg }}</span>
+        <button type="button" class="alert-close" (click)="dismissError()" aria-label="Dismiss notification">&times;</button>
+      </div>
+    }
+    @if (error(); as message) {
+      <div class="dashboard-error" role="alert">
+        <span class="dashboard-error-icon" aria-hidden="true">!</span>
+        <span>{{ message }}</span>
+        <button type="button" class="btn-text" (click)="load()">Retry</button>
+      </div>
+    }
+
+    <section class="panel management-panel" aria-labelledby="users-section-title">
+      <header class="panel-header">
+        <div class="panel-heading">
+          <h2 id="users-section-title">Accounts</h2>
+          @if (!loading() && filteredUsers().length > 0) {
+            <span class="panel-count">{{ filteredUsers().length }} shown</span>
+          }
+        </div>
+        <label class="filter-field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <input
+            type="search"
+            [value]="search()"
+            (input)="onSearch($event)"
+            placeholder="Search by name or email…"
+            aria-label="Search users"
+          />
+        </label>
+      </header>
+
+      <div class="segmented" role="tablist" aria-label="Account scope">
+        <button type="button" class="segment" [class.active]="scope() === 'ACTIVE'" (click)="setScope('ACTIVE')" role="tab" [attr.aria-selected]="scope() === 'ACTIVE'">
+          Active <span class="tab-badge">{{ counts().active }}</span>
+        </button>
+        <button type="button" class="segment" [class.active]="scope() === 'DELETED'" (click)="setScope('DELETED')" role="tab" [attr.aria-selected]="scope() === 'DELETED'">
+          Deleted <span class="tab-badge is-deleted">{{ counts().deleted }}</span>
+        </button>
+      </div>
+
+      @if (scope() === 'ACTIVE') {
+        <div class="status-filters" role="tablist" aria-label="Filter by role and status">
+          <button type="button" class="status-tab" [class.active]="roleFilter() === 'ALL'" (click)="setRoleFilter('ALL')" role="tab" [attr.aria-selected]="roleFilter() === 'ALL'">All roles</button>
+          <button type="button" class="status-tab" [class.active]="roleFilter() === 'PATIENT'" (click)="setRoleFilter('PATIENT')" role="tab" [attr.aria-selected]="roleFilter() === 'PATIENT'">Patients</button>
+          <button type="button" class="status-tab" [class.active]="roleFilter() === 'DOCTOR'" (click)="setRoleFilter('DOCTOR')" role="tab" [attr.aria-selected]="roleFilter() === 'DOCTOR'">Doctors</button>
+          <span class="filter-divider" aria-hidden="true"></span>
+          <button type="button" class="status-tab" [class.active]="statusFilter() === 'ALL'" (click)="setStatusFilter('ALL')" role="tab" [attr.aria-selected]="statusFilter() === 'ALL'">Any status</button>
+          <button type="button" class="status-tab" [class.active]="statusFilter() === 'ACTIVE'" (click)="setStatusFilter('ACTIVE')" role="tab" [attr.aria-selected]="statusFilter() === 'ACTIVE'">Active</button>
+          <button type="button" class="status-tab" [class.active]="statusFilter() === 'DISABLED'" (click)="setStatusFilter('DISABLED')" role="tab" [attr.aria-selected]="statusFilter() === 'DISABLED'">Disabled</button>
+          <button type="button" class="status-tab" [class.active]="statusFilter() === 'BANNED'" (click)="setStatusFilter('BANNED')" role="tab" [attr.aria-selected]="statusFilter() === 'BANNED'">Banned</button>
+        </div>
+      }
+
+      <div class="panel-body">
+        @if (loading()) {
+          <p class="appointments-status" role="status">Loading accounts…</p>
+        } @else if (filteredUsers().length === 0) {
+          <div class="empty-state">
+            <span class="empty-state-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+              </svg>
+            </span>
+            <p class="empty-state-title">
+              {{ scope() === 'DELETED' ? 'No deleted accounts' : 'No matching accounts' }}
+            </p>
+            <p class="empty-state-hint">
+              {{ scope() === 'DELETED' ? 'Soft-deleted accounts will appear here.' : 'Try a different search, role, or status filter.' }}
+            </p>
+          </div>
+        } @else {
+          <div class="table-scroll">
+            <table class="admin-table users-table">
+              <thead>
+                <tr>
+                  <th scope="col">User</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Role</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Registered</th>
+                  @if (scope() === 'DELETED') {
+                    <th scope="col">Deleted</th>
+                  } @else {
+                    <th scope="col" class="th-actions">Actions</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (user of filteredUsers(); track user.id) {
+                  <tr>
+                    <td data-label="User">
+                      <span class="person-cell">
+                        <span class="person-avatar" aria-hidden="true">{{ userInitials(user.name) }}</span>
+                        <span class="person-name">{{ user.name }}</span>
+                      </span>
+                    </td>
+                    <td data-label="Email">{{ user.email }}</td>
+                    <td data-label="Role">
+                      <span class="role-pill {{ roleClass(user.role) }}">{{ user.role }}</span>
+                    </td>
+                    <td data-label="Status">
+                      <span class="status-pill {{ statusClass(user.status) }}">{{ user.status }}</span>
+                      @if (user.status === 'BANNED' && user.banExpiresAt) {
+                        <span class="status-sub">until {{ banExpiry(user.banExpiresAt) }}</span>
+                      }
+                    </td>
+                    <td data-label="Registered">{{ registeredAt(user.registeredAt) }}</td>
+                    @if (scope() === 'DELETED') {
+                      <td data-label="Deleted">
+                        <div class="deleted-meta">
+                          <span>{{ deletedAt(user.deletedAt) }}</span>
+                          @if (user.deletedByEmail) {
+                            <span class="deleted-by">by {{ user.deletedByEmail }}</span>
+                          }
+                        </div>
+                      </td>
+                    } @else {
+                      <td data-label="Actions" class="td-actions">
+                        @if (busyId() === user.id) {
+                          <span class="action-muted">…</span>
+                        } @else {
+                          @if (canBan(user)) {
+                            <button type="button" class="btn-action-warn" (click)="openBanModal(user)" aria-label="Ban this account">Ban</button>
+                          }
+                          @if (canDisable(user)) {
+                            <button type="button" class="btn-action-secondary" (click)="toggleDisable(user)" aria-label="Disable this account">Disable</button>
+                          }
+                          @if (canEnable(user)) {
+                            <button type="button" class="btn-action-ok" (click)="enable(user)" aria-label="Enable this account">Enable</button>
+                          }
+                          <button type="button" class="btn-action-danger" (click)="openDeleteModal(user)" aria-label="Delete this account">Delete</button>
+                        }
+                      </td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </section>
+  </section>
+
+  <!-- Soft-delete confirmation -->
+  @if (userToDelete(); as user) {
+    <div class="modal-backdrop" (click)="closeDeleteModal()" role="presentation">
+      <div class="modal-dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+        <header class="modal-header">
+          <div class="modal-icon-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            </svg>
+          </div>
+          <div>
+            <h3 id="delete-title" class="modal-title">Delete Account</h3>
+            <p class="modal-subtitle">This account will be deactivated and hidden from the active list.</p>
+          </div>
+        </header>
+        <div class="modal-body">
+          <div class="appointment-summary-card">
+            <div class="summary-row">
+              <span class="summary-key">User</span>
+              <span class="summary-val font-semibold">{{ user.name }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Email</span>
+              <span class="summary-val">{{ user.email }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Role</span>
+              <span class="summary-val">{{ user.role }}</span>
+            </div>
+          </div>
+          <p class="modal-warning-text">
+            Appointments, prescriptions, and medical reports are preserved. The user will no longer be able to log in.
+            You can review deleted accounts under the <strong>Deleted</strong> tab.
+          </p>
+        </div>
+        <footer class="modal-footer">
+          <button type="button" class="btn-modal-secondary" (click)="closeDeleteModal()" [disabled]="deleting()">Keep Account</button>
+          <button type="button" class="btn-modal-danger" (click)="confirmDelete()" [disabled]="deleting()">
+            @if (deleting()) {
+              <span class="btn-spinner" aria-hidden="true"></span> Deleting…
+            } @else {
+              Delete Account
+            }
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
+
+  <!-- Ban duration selection -->
+  @if (userToBan(); as user) {
+    <div class="modal-backdrop" (click)="closeBanModal()" role="presentation">
+      <div class="modal-dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="ban-title">
+        <header class="modal-header">
+          <div class="modal-icon-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+            </svg>
+          </div>
+          <div>
+            <h3 id="ban-title" class="modal-title">Ban Account</h3>
+            <p class="modal-subtitle">Temporarily block {{ user.name }} from signing in.</p>
+          </div>
+        </header>
+        <div class="modal-body">
+          <div class="ban-options" role="radiogroup" aria-label="Ban duration">
+            @for (days of [1, 7, 30]; track days) {
+              <button
+                type="button"
+                class="ban-option"
+                [class.active]="banDuration() === days"
+                (click)="banDuration.set(days)"
+                role="radio"
+                [attr.aria-checked]="banDuration() === days"
+              >
+                {{ days }} day{{ days === 1 ? '' : 's' }}
+              </button>
+            }
+          </div>
+          <p class="modal-warning-text">
+            The ban lifts automatically after the chosen period. You can re-enable the account earlier from the Active list.
+          </p>
+        </div>
+        <footer class="modal-footer">
+          <button type="button" class="btn-modal-secondary" (click)="closeBanModal()" [disabled]="banning()">Cancel</button>
+          <button type="button" class="btn-modal-danger" (click)="confirmBan()" [disabled]="banning()">
+            @if (banning()) {
+              <span class="btn-spinner" aria-hidden="true"></span> Banning…
+            } @else {
+              Ban for {{ banDuration() }} day{{ banDuration() === 1 ? '' : 's' }}
+            }
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
+</div>
