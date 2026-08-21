@@ -1,18 +1,331 @@
 <div class="dashboard-page">
   <header class="page-header">
-    <h1>Profile</h1>
-    <p class="subtitle">Manage your account settings and preferences.</p>
+    <h1>Profile &amp; settings</h1>
+    <p class="subtitle">Manage your personal information, password, and account.</p>
   </header>
+
   <section class="dashboard-content">
-    <div class="empty-state">
-      <span class="empty-state-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-      </span>
-      <p class="empty-state-title">Profile settings coming soon</p>
-      <p class="empty-state-hint">You will be able to update your professional information here.</p>
-    </div>
+    @if (loading()) {
+      <div class="state-card">
+        <span class="spinner" aria-hidden="true"></span>
+        <p class="state-text">Loading your profile…</p>
+      </div>
+    } @else if (loadError()) {
+      <div class="state-card">
+        <p class="state-text state-error">{{ loadError() }}</p>
+        <button class="btn btn-secondary" type="button" (click)="loadProfile()">Try again</button>
+      </div>
+    } @else {
+      <!-- ===================== Personal Information ===================== -->
+      <article class="section-card">
+        <div class="section-header">
+          <div class="section-heading">
+            <span class="section-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </span>
+            <div>
+              <h2>Personal Information</h2>
+              <p class="section-desc">Your name, email, and contact number.</p>
+            </div>
+          </div>
+          @if (!editing()) {
+            <button class="btn btn-ghost" type="button" (click)="startEditing()">Edit</button>
+          }
+        </div>
+
+        <div class="section-body">
+          @if (saveSuccess()) {
+            <div class="alert alert-success" role="status">Your information has been updated.</div>
+          }
+          @if (saveError()) {
+            <div class="alert alert-error" role="alert">{{ saveError() }}</div>
+          }
+
+          @if (!editing()) {
+            <dl class="summary">
+              <div class="summary-row">
+                <dt>First name</dt>
+                <dd>{{ profile()!.firstName }}</dd>
+              </div>
+              <div class="summary-row">
+                <dt>Last name</dt>
+                <dd>{{ profile()!.lastName }}</dd>
+              </div>
+              <div class="summary-row">
+                <dt>Email</dt>
+                <dd>{{ profile()!.email }}</dd>
+              </div>
+              <div class="summary-row">
+                <dt>Phone number</dt>
+                <dd>{{ profile()!.phoneNumber || '—' }}</dd>
+              </div>
+            </dl>
+          } @else {
+            <form [formGroup]="infoForm" (ngSubmit)="saveInfo()" novalidate>
+              <div class="field-row">
+                <div class="field">
+                  <label class="label" for="firstName">First name</label>
+                  <input id="firstName" class="input" type="text" formControlName="firstName" autocomplete="given-name" />
+                  @if (infoFieldError('firstName'); as msg) {
+                    <span class="field-error">{{ msg }}</span>
+                  }
+                  @if (infoServerError('firstName'); as msg) {
+                    <span class="field-error">{{ msg }}</span>
+                  }
+                </div>
+
+                <div class="field">
+                  <label class="label" for="lastName">Last name</label>
+                  <input id="lastName" class="input" type="text" formControlName="lastName" autocomplete="family-name" />
+                  @if (infoFieldError('lastName'); as msg) {
+                    <span class="field-error">{{ msg }}</span>
+                  }
+                  @if (infoServerError('lastName'); as msg) {
+                    <span class="field-error">{{ msg }}</span>
+                  }
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label" for="email">Email</label>
+                <input id="email" class="input" type="email" formControlName="email" autocomplete="email" />
+                @if (infoFieldError('email'); as msg) {
+                  <span class="field-error">{{ msg }}</span>
+                }
+                @if (infoServerError('email'); as msg) {
+                  <span class="field-error">{{ msg }}</span>
+                }
+              </div>
+
+              <div class="field">
+                <label class="label" for="phoneNumber">
+                  Phone number <span class="optional">(optional)</span>
+                </label>
+                <input id="phoneNumber" class="input" type="tel" formControlName="phoneNumber" autocomplete="tel" />
+                @if (infoFieldError('phoneNumber'); as msg) {
+                  <span class="field-error">{{ msg }}</span>
+                }
+                @if (infoServerError('phoneNumber'); as msg) {
+                  <span class="field-error">{{ msg }}</span>
+                }
+              </div>
+
+              <div class="form-actions">
+                <button class="btn btn-primary" type="submit" [disabled]="saving()">
+                  @if (saving()) {
+                    <span class="spinner" aria-hidden="true"></span>
+                    Saving…
+                  } @else {
+                    Save changes
+                  }
+                </button>
+                <button class="btn btn-ghost" type="button" (click)="cancelEditing()" [disabled]="saving()">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          }
+        </div>
+      </article>
+
+      <!-- ===================== Professional Information ===================== -->
+      <article class="section-card">
+        <div class="section-header">
+          <div class="section-heading">
+            <span class="section-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                <path d="M6 12v5c3 3 9 3 12 0v-5" />
+              </svg>
+            </span>
+            <div>
+              <h2>Professional Information</h2>
+              <p class="section-desc">Your specialty and license details.</p>
+            </div>
+          </div>
+          @if (!editingProfessional()) {
+            <button class="btn btn-ghost" type="button" (click)="startEditingProfessional()">Edit</button>
+          }
+        </div>
+
+        <div class="section-body">
+          @if (professionalSuccess()) {
+            <div class="alert alert-success" role="status">Your professional information has been updated.</div>
+          }
+          @if (professionalError()) {
+            <div class="alert alert-error" role="alert">{{ professionalError() }}</div>
+          }
+
+          @if (!editingProfessional()) {
+            <dl class="summary">
+              <div class="summary-row">
+                <dt>Specialty</dt>
+                <dd>{{ profile()!.specialty || '—' }}</dd>
+              </div>
+              <div class="summary-row">
+                <dt>License number</dt>
+                <dd>{{ profile()!.licenseNumber || '—' }}</dd>
+              </div>
+            </dl>
+          } @else {
+            <form [formGroup]="professionalForm" (ngSubmit)="saveProfessional()" novalidate>
+              <div class="field">
+                <label class="label" for="specialty">Specialty</label>
+                <input id="specialty" class="input" type="text" formControlName="specialty" />
+                @if (professionalFieldError('specialty'); as msg) {
+                  <span class="field-error">{{ msg }}</span>
+                }
+                @if (professionalServerError('specialty'); as msg) {
+                  <span class="field-error">{{ msg }}</span>
+                }
+              </div>
+
+              <div class="field">
+                <label class="label" for="licenseNumber">
+                  License number <span class="optional">(optional)</span>
+                </label>
+                <input id="licenseNumber" class="input" type="text" formControlName="licenseNumber" />
+                @if (professionalFieldError('licenseNumber'); as msg) {
+                  <span class="field-error">{{ msg }}</span>
+                }
+                @if (professionalServerError('licenseNumber'); as msg) {
+                  <span class="field-error">{{ msg }}</span>
+                }
+              </div>
+
+              <div class="form-actions">
+                <button class="btn btn-primary" type="submit" [disabled]="savingProfessional()">
+                  @if (savingProfessional()) {
+                    <span class="spinner" aria-hidden="true"></span>
+                    Saving…
+                  } @else {
+                    Save changes
+                  }
+                </button>
+                <button class="btn btn-ghost" type="button" (click)="cancelEditingProfessional()" [disabled]="savingProfessional()">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          }
+        </div>
+      </article>
+
+      <!-- ===================== Change Password ===================== -->
+      <article class="section-card">
+        <div class="section-header">
+          <div class="section-heading">
+            <span class="section-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </span>
+            <div>
+              <h2>Change Password</h2>
+              <p class="section-desc">Keep your account secure with a strong password.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-body">
+          @if (changeSuccess()) {
+            <div class="alert alert-success" role="status">Your password has been updated.</div>
+          }
+          @if (changeError()) {
+            <div class="alert alert-error" role="alert">{{ changeError() }}</div>
+          }
+
+          <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" novalidate>
+            <div class="field">
+              <label class="label" for="currentPassword">Current password</label>
+              <input id="currentPassword" class="input" type="password" formControlName="currentPassword" autocomplete="current-password" />
+              @if (passwordFieldError('currentPassword'); as msg) {
+                <span class="field-error">{{ msg }}</span>
+              }
+              @if (passwordServerError('currentPassword'); as msg) {
+                <span class="field-error">{{ msg }}</span>
+              }
+            </div>
+
+            <div class="field">
+              <label class="label" for="newPassword">New password</label>
+              <input id="newPassword" class="input" type="password" formControlName="newPassword" autocomplete="new-password" />
+              @if (passwordFieldError('newPassword'); as msg) {
+                <span class="field-error">{{ msg }}</span>
+              }
+              @if (passwordServerError('newPassword'); as msg) {
+                <span class="field-error">{{ msg }}</span>
+              }
+            </div>
+
+            <div class="field">
+              <label class="label" for="confirmPassword">Confirm new password</label>
+              <input id="confirmPassword" class="input" type="password" formControlName="confirmPassword" autocomplete="new-password" />
+              @if (confirmPasswordError(); as msg) {
+                <span class="field-error">{{ msg }}</span>
+              }
+              @if (passwordServerError('confirmPassword'); as msg) {
+                <span class="field-error">{{ msg }}</span>
+              }
+            </div>
+
+            <p class="hint">Use at least 8 characters. Changing your password signs you out everywhere else.</p>
+
+            <div class="form-actions">
+              <button class="btn btn-primary" type="submit" [disabled]="changing()">
+                @if (changing()) {
+                  <span class="spinner" aria-hidden="true"></span>
+                  Updating…
+                } @else {
+                  Update password
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </article>
+
+      <!-- ===================== Account Settings ===================== -->
+      <article class="section-card">
+        <div class="section-header">
+          <div class="section-heading">
+            <span class="section-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+            </span>
+            <div>
+              <h2>Account Settings</h2>
+              <p class="section-desc">Your account identity and membership details.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-body">
+          @if (account(); as acc) {
+            <dl class="summary">
+              <div class="summary-row">
+                <dt>Account type</dt>
+                <dd><span class="role-badge">{{ acc.roleLabel }}</span></dd>
+              </div>
+              <div class="summary-row">
+                <dt>Login email</dt>
+                <dd>{{ acc.email }}</dd>
+              </div>
+              <div class="summary-row">
+                <dt>Member since</dt>
+                <dd>{{ acc.memberSince }}</dd>
+              </div>
+            </dl>
+            <p class="hint">Your login email and account type are managed at the account level. Update your email from the Personal Information section above.</p>
+          }
+        </div>
+      </article>
+    }
   </section>
 </div>
