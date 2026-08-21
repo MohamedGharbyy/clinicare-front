@@ -3,6 +3,8 @@ import { finalize } from 'rxjs';
 import { AppointmentService } from '../../../core/services/appointment.service';
 import type { Appointment } from '../../../core/services/appointment.service';
 import { AuthService } from '../../../auth/auth.service';
+import { DoctorService } from '../../../core/services/doctor.service';
+import type { DoctorProfile } from '../../../core/services/doctor.service';
 import { DoctorNamePipe } from '../../../core/pipes/doctor-name.pipe';
 
 @Component({
@@ -14,6 +16,7 @@ import { DoctorNamePipe } from '../../../core/pipes/doctor-name.pipe';
 export class DoctorAppointmentsComponent {
   private readonly appointmentService = inject(AppointmentService);
   private readonly authService = inject(AuthService);
+  private readonly doctorService = inject(DoctorService);
 
   readonly appointments = signal<Appointment[]>([]);
   readonly appointmentsLoading = signal(true);
@@ -21,14 +24,23 @@ export class DoctorAppointmentsComponent {
   readonly actionInProgress = signal<{ id: number; kind: 'accept' | 'reject' } | null>(null);
   readonly actionError = signal<string | null>(null);
   readonly user = this.authService.user;
+  readonly profile = signal<DoctorProfile | null>(null);
 
+  /**
+   * Display name built from the authenticated doctor's real first and last
+   * name, as returned by {@code GET /api/doctor/profile} (sourced from the
+   * `users` table). The {@code Dr.} prefix is applied by {@link DoctorNamePipe}.
+   */
   readonly rawDoctorName = computed(() => {
-    const fromAppointment = this.appointments()[0]?.doctorName?.trim();
-    if (fromAppointment) return fromAppointment;
-    return deriveNameFromEmail(this.user()?.email);
+    const p = this.profile();
+    if (!p) return '';
+    return [p.firstName, p.lastName]
+      .filter((part): part is string => Boolean(part && part.trim()))
+      .join(' ')
+      .trim();
   });
 
-  readonly doctorSpecialty = computed(() => this.appointments()[0]?.doctorSpecialty?.trim() ?? '');
+  readonly doctorSpecialty = computed(() => this.profile()?.specialty?.trim() ?? '');
 
   readonly pendingCount = computed(() => this.appointments().filter((a) => a.status === 'PENDING').length);
   readonly todayCount = computed(() => this.todayAppointments().length);
@@ -57,6 +69,14 @@ export class DoctorAppointmentsComponent {
 
   constructor() {
     this.loadAppointments();
+    this.loadProfile();
+  }
+
+  private loadProfile(): void {
+    this.doctorService.getProfile().subscribe({
+      next: (profile) => this.profile.set(profile),
+      error: () => this.profile.set(null),
+    });
   }
 
   loadAppointments(): void {
@@ -161,15 +181,4 @@ function initialsFromName(name: string): string {
   if (parts.length === 0) return '?';
   if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
   return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
-}
-
-function deriveNameFromEmail(email: string | undefined): string {
-  const local = (email ?? '').split('@')[0] ?? '';
-  if (!local) return '';
-  const parts = local
-    .split(/[._-]/)
-    .map((p) => p.replace(/[^a-zA-Z]/g, ''))
-    .filter((p) => p && !/^dr$/i.test(p));
-  if (parts.length === 0) return '';
-  return parts.map((p) => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
 }

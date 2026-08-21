@@ -10,6 +10,8 @@ export type RegisterRole = Extract<UserRole, 'PATIENT' | 'DOCTOR'>;
 export interface UserInfo {
   id: number;
   email: string;
+  firstName: string;
+  lastName: string;
   role: UserRole;
 }
 
@@ -60,4 +62,30 @@ export interface AuthResponse extends UserInfo {
 export interface AuthState {
   token: string | null;
   user: UserInfo | null;
+}
+
+/** Body for {@code POST /api/auth/verify-email}. */
+export interface VerifyEmailRequest {
+  email: string;
+  /** 6-digit numeric verification code sent by email. */
+  code: string;
+}
+
+/** Body returned by {@code POST /api/auth/verify-email}. */
+export interface EmailVerificationResponse {
+  verified: boolean;
+  message: string;
+}
+
+/** Body for {@code POST /api/auth/resend-verification}. */
+export interface ResendVerificationRequest {
+  email: string;
+}
+
+/** Body returned by {@code POST /api/auth/resend-verification}. */
+export interface ResendVerificationResponse {
+  sent: boolean;
+  message: string;
+  /** Cooldown in seconds, present on a successful resend. */
+  retryAfterSeconds?: number | null;
 }

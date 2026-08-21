@@ -1,0 +1,79 @@
+<div class="page">
+  <div class="collage">
+      <div class="brand-panel" aria-label="CliniCare medical team background"></div>
+
+      <div class="card">
+    <header class="card-header">
+      <h1>Verify your email</h1>
+      <p class="subtitle">Confirm your address to activate your CliniCare account.</p>
+    </header>
+
+    @if (email(); as userEmail) {
+      <p class="email-line">
+        Code sent to <strong>{{ userEmail }}</strong>
+      </p>
+    }
+
+    @if (verified()) {
+      <div class="alert alert-success" role="status">
+        {{ successMessage() }}
+      </div>
+      <button class="btn btn-primary" type="button" (click)="goToLogin()">
+        Continue to sign in
+      </button>
+    } @else {
+      @if (formError(); as error) {
+        <div class="alert alert-error" role="alert">{{ error }}</div>
+      }
+      @if (successMessage(); as notice) {
+        <div class="alert alert-notice" role="status">{{ notice }}</div>
+      }
+
+      <p class="instruction">
+        Enter the 6-digit verification code sent to your email.
+      </p>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="field">
+          <label class="label" for="code">Verification code</label>
+          <input
+            id="code"
+            class="input code-input"
+            type="text"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            maxlength="6"
+            placeholder="000000"
+            formControlName="code"
+          />
+          @if (fieldError(); as msg) {
+            <span class="field-error">{{ msg }}</span>
+          }
+        </div>
+
+        <button class="btn btn-primary" type="submit" [disabled]="submitting()">
+          @if (submitting()) {
+            <span class="spinner" aria-hidden="true"></span>
+            Verifying…
+          } @else {
+            Verify
+          }
+        </button>
+      </form>
+
+      <p class="form-footer">
+        Didn't receive the code?
+        @if (resendCooldown() > 0) {
+          <button class="link-btn" type="button" disabled>
+            Resend code ({{ resendCooldown() }}s)
+          </button>
+        } @else {
+          <button class="link-btn" type="button" (click)="onResend()" [disabled]="resending()">
+            @if (resending()) { Sending… } @else { Resend code }
+          </button>
+        }
+      </p>
+    }
+    </div>
+  </div>
+</div>

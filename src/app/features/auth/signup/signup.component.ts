@@ -103,8 +103,8 @@ export class SignupComponent {
       .register(payload)
       .pipe(finalize(() => this.submitting.set(false)))
       .subscribe({
-        next: () =>
-          this.router.navigate(['/login'], { queryParams: { registered: '1' } }),
+        next: (res) =>
+          this.router.navigate(['/verify-email'], { queryParams: { email: res.email } }),
         error: (err) => this.handleError(err),
       });
   }

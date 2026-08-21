@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { LoginComponent } from './features/auth/login/login.component';
 import { SignupComponent } from './features/auth/signup/signup.component';
+import { VerifyEmailComponent } from './features/auth/verify-email/verify-email.component';
 import { PatientDashboardComponent } from './features/patient/dashboard/patient-dashboard.component';
 import { PatientAppointmentsComponent } from './features/patient/appointments/patient-appointments.component';
 import { PatientPrescriptionsComponent } from './features/patient/prescriptions/patient-prescriptions.component';
@@ -27,6 +28,7 @@ import { roleGuard } from './core/guards/role.guard';
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
   { path: 'signup', canActivate: [loginGuard], component: SignupComponent },
+  { path: 'verify-email', canActivate: [loginGuard], component: VerifyEmailComponent },
   { path: 'login', canActivate: [loginGuard], component: LoginComponent },
   {
     path: 'patient',

@@ -8,10 +8,14 @@ import type { Observable } from 'rxjs';
 import type {
   AuthResponse,
   AuthState,
+  EmailVerificationResponse,
   LoginRequest,
   RegisterRequest,
   RegisterResponse,
+  ResendVerificationRequest,
+  ResendVerificationResponse,
   UserInfo,
+  VerifyEmailRequest,
 } from './auth.models';
 import { TOKEN_STORAGE } from './token.storage';
 import { isJwtExpired, isValidUserInfo } from './jwt.utils';
@@ -60,6 +64,24 @@ export class AuthService {
   register(payload: RegisterRequest): Observable<RegisterResponse> {
     return this.http.post<RegisterResponse>(
       `${API_BASE_URL}/api/auth/register`,
+      payload,
+    );
+  }
+
+  /** Submits the 6-digit verification code for the given email. */
+  verifyEmail(payload: VerifyEmailRequest): Observable<EmailVerificationResponse> {
+    return this.http.post<EmailVerificationResponse>(
+      `${API_BASE_URL}/api/auth/verify-email`,
+      payload,
+    );
+  }
+
+  /** Requests a fresh verification code for the given email. */
+  resendVerification(
+    payload: ResendVerificationRequest,
+  ): Observable<ResendVerificationResponse> {
+    return this.http.post<ResendVerificationResponse>(
+      `${API_BASE_URL}/api/auth/resend-verification`,
       payload,
     );
   }

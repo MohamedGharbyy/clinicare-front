@@ -17,6 +17,31 @@
       <div class="alert alert-error" role="alert">{{ error }}</div>
     }
 
+    @if (unverified()) {
+      <div class="resend-box" role="region" aria-label="Resend verification code">
+        @if (resendSuccess(); as notice) {
+          <div class="alert alert-notice" role="status">{{ notice }}</div>
+        }
+        <p class="resend-hint">
+          Didn't get the code, or need a new one?
+        </p>
+        @if (resendCooldown() > 0) {
+          <button class="link-btn" type="button" disabled>
+            Resend verification code ({{ resendCooldown() }}s)
+          </button>
+        } @else {
+          <button class="link-btn" type="button" (click)="onResend()" [disabled]="resending()">
+            @if (resending()) { Sending… } @else { Resend verification code }
+          </button>
+        }
+        <p class="form-footer">
+          <a class="link" routerLink="/verify-email" [queryParams]="{ email: unverifiedEmail() }">
+            Enter the code
+          </a>
+        </p>
+      </div>
+    }
+
     <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
       <div class="field">
         <label class="label" for="login-email">Email</label>

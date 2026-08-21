@@ -1,0 +1,33 @@
+.resend-box {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #b8e6ff;
+  background: #eaf7ff;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.resend-hint {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: var(--clini-slate-700);
+}
+
+.link-btn {
+  border: none;
+  background: none;
+  padding: 0;
+  color: #38B6FF;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.link-btn:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.link-btn:disabled {
+  color: var(--clini-slate-400);
+  cursor: not-allowed;
+}

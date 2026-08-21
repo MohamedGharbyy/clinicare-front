@@ -170,6 +170,8 @@ export class PatientProfileComponent {
             this.authService.setSession(result.token, {
               id: result.id,
               email: result.email,
+              firstName: result.firstName,
+              lastName: result.lastName,
               role: result.role,
             });
           }
