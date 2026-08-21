@@ -40,7 +40,7 @@ function isFuture(appointment: Appointment): boolean {
 }
 
 function isAccepted(status: string): boolean {
-  return status === 'CONFIRMED' || status === 'COMPLETED';
+  return status === 'CONFIRMED' || status === 'IN_PROGRESS' || status === 'COMPLETED';
 }
 
 function initialsFromName(name: string): string {
@@ -137,6 +137,7 @@ export class DoctorDashboardComponent {
     switch (status) {
       case 'PENDING': return 'is-pending';
       case 'CONFIRMED': return 'is-confirmed';
+      case 'IN_PROGRESS': return 'is-in-progress';
       case 'COMPLETED': return 'is-completed';
       case 'REJECTED':
       case 'CANCELLED': return 'is-negative';

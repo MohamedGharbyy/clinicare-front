@@ -110,6 +110,7 @@ export class DoctorAppointmentsComponent {
     switch (status) {
       case 'PENDING': return 'is-pending';
       case 'CONFIRMED': return 'is-confirmed';
+      case 'IN_PROGRESS': return 'is-in-progress';
       case 'COMPLETED': return 'is-completed';
       case 'REJECTED':
       case 'CANCELLED': return 'is-negative';
@@ -153,7 +154,7 @@ function isFuture(appointment: Appointment): boolean {
   return !Number.isNaN(d.getTime()) && d.getTime() > Date.now();
 }
 
-function isAccepted(status: string): boolean { return status === 'CONFIRMED' || status === 'COMPLETED'; }
+function isAccepted(status: string): boolean { return status === 'CONFIRMED' || status === 'IN_PROGRESS' || status === 'COMPLETED'; }
 
 function initialsFromName(name: string): string {
   const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);

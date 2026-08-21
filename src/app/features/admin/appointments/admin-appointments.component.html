@@ -77,6 +77,9 @@
         <button type="button" class="status-tab" [class.active]="appointmentStatusFilter() === 'CONFIRMED'" (click)="setStatusFilter('CONFIRMED')" role="tab" [attr.aria-selected]="appointmentStatusFilter() === 'CONFIRMED'">
           Confirmed <span class="tab-badge is-confirmed">{{ statusCounts().confirmed }}</span>
         </button>
+        <button type="button" class="status-tab" [class.active]="appointmentStatusFilter() === 'IN_PROGRESS'" (click)="setStatusFilter('IN_PROGRESS')" role="tab" [attr.aria-selected]="appointmentStatusFilter() === 'IN_PROGRESS'">
+          In Progress <span class="tab-badge is-in-progress">{{ statusCounts().inProgress }}</span>
+        </button>
         <button type="button" class="status-tab" [class.active]="appointmentStatusFilter() === 'COMPLETED'" (click)="setStatusFilter('COMPLETED')" role="tab" [attr.aria-selected]="appointmentStatusFilter() === 'COMPLETED'">
           Completed <span class="tab-badge is-completed">{{ statusCounts().completed }}</span>
         </button>

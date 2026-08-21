@@ -88,10 +88,11 @@
 .status-pill {
   flex: 0 0 auto; padding: 0.25rem 0.65rem; border-radius: 999px; font-size: 0.7rem; font-weight: 600;
   letter-spacing: 0.03em; text-transform: uppercase; background: #ffffff; color: var(--clini-slate-500); border: 1px solid var(--clini-slate-300);
-  &:not(.is-pending):not(.is-confirmed):not(.is-completed):not(.is-negative) { background: #fff; color: var(--clini-slate-500); border: 1px solid var(--clini-slate-300); }
+  &:not(.is-pending):not(.is-confirmed):not(.is-in-progress):not(.is-completed):not(.is-negative) { background: #fff; color: var(--clini-slate-500); border: 1px solid var(--clini-slate-300); }
 }
 .status-pill.is-pending { background: var(--clini-blue-50); color: var(--clini-blue-700); border-color: var(--clini-blue-100); }
 .status-pill.is-confirmed { background: var(--clini-success-100); color: var(--clini-success-600); }
+.status-pill.is-in-progress { background: #fef3c7; color: #b45309; }
 .status-pill.is-completed { background: var(--clini-slate-100); color: var(--clini-slate-700); }
 .status-pill.is-negative { background: var(--clini-danger-100); color: var(--clini-danger-600); }
 

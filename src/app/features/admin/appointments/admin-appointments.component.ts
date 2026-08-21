@@ -8,6 +8,7 @@ export type AppointmentStatusFilter =
   | 'ALL'
   | 'PENDING'
   | 'CONFIRMED'
+  | 'IN_PROGRESS'
   | 'COMPLETED'
   | 'CANCELLED'
   | 'REJECTED';
@@ -54,6 +55,7 @@ export class AdminAppointmentsComponent {
       all: list.length,
       pending: list.filter((a) => a.status === 'PENDING').length,
       confirmed: list.filter((a) => a.status === 'CONFIRMED').length,
+      inProgress: list.filter((a) => a.status === 'IN_PROGRESS').length,
       completed: list.filter((a) => a.status === 'COMPLETED').length,
       cancelled: list.filter((a) => a.status === 'CANCELLED').length,
       rejected: list.filter((a) => a.status === 'REJECTED').length,
@@ -139,6 +141,7 @@ export class AdminAppointmentsComponent {
     switch (status) {
       case 'PENDING': return 'is-pending';
       case 'CONFIRMED': return 'is-confirmed';
+      case 'IN_PROGRESS': return 'is-in-progress';
       case 'COMPLETED': return 'is-completed';
       case 'CANCELLED': return 'is-cancelled';
       case 'REJECTED': return 'is-negative';

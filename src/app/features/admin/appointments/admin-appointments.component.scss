@@ -92,6 +92,7 @@
   text-transform: uppercase; white-space: nowrap; background: #fff; color: var(--clini-slate-500); border: 1px solid var(--clini-slate-300);
   &.is-pending { background: var(--clini-blue-50); color: var(--clini-blue-700); border-color: var(--clini-blue-100); }
   &.is-confirmed { background: var(--clini-success-100); color: var(--clini-success-600); border-color: transparent; }
+  &.is-in-progress { background: #fef3c7; color: #b45309; border-color: transparent; }
   &.is-completed { background: var(--clini-slate-100); color: var(--clini-slate-700); border-color: transparent; }
   &.is-cancelled { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
   &.is-negative { background: var(--clini-danger-100); color: var(--clini-danger-600); border-color: transparent; }
