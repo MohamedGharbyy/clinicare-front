@@ -167,9 +167,12 @@
                           @if (canDisable(user)) {
                             <button type="button" class="btn-action-secondary" (click)="toggleDisable(user)" aria-label="Disable this account">Disable</button>
                           }
-                          @if (canEnable(user)) {
-                            <button type="button" class="btn-action-ok" (click)="enable(user)" aria-label="Enable this account">Enable</button>
-                          }
+                           @if (canUnban(user)) {
+                             <button type="button" class="btn-action-ok" (click)="unban(user)" aria-label="Unban this account">Unban</button>
+                           }
+                           @if (canEnable(user)) {
+                             <button type="button" class="btn-action-ok" (click)="enable(user)" aria-label="Enable this account">Enable</button>
+                           }
                           <button type="button" class="btn-action-danger" (click)="openDeleteModal(user)" aria-label="Delete this account">Delete</button>
                         }
                       </td>

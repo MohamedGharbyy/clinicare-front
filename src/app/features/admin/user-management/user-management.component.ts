@@ -180,6 +180,10 @@ export class AdminUserManagementComponent {
     this.runAction(user, this.adminService.enableUser(user.id), 'enabled');
   }
 
+  unban(user: AdminUser): void {
+    this.runAction(user, this.adminService.enableUser(user.id), 'unbanned');
+  }
+
   private runAction(user: AdminUser, op: ReturnType<AdminService['enableUser']>, verb: string): void {
     this.busyId.set(user.id);
     this.actionError.set(null);
@@ -225,15 +229,19 @@ export class AdminUserManagementComponent {
   }
 
   canDisable(user: AdminUser): boolean {
-    return user.status === 'ACTIVE' || user.status === 'BANNED';
+    return user.status === 'ACTIVE';
   }
 
   canEnable(user: AdminUser): boolean {
-    return user.status === 'DISABLED' || user.status === 'BANNED';
+    return user.status === 'DISABLED';
   }
 
   canBan(user: AdminUser): boolean {
-    return user.status === 'ACTIVE' || user.status === 'DISABLED';
+    return user.status === 'ACTIVE';
+  }
+
+  canUnban(user: AdminUser): boolean {
+    return user.status === 'BANNED';
   }
 
   userInitials(name: string): string {
