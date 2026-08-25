@@ -56,3 +56,9 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Date of birth: iOS Safari native date inputs have an intrinsic minimum
+   width that can exceed the card on small screens. Allow it to shrink. */
+#dateOfBirth {
+  min-width: 0;
+}

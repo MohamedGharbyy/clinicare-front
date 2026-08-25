@@ -431,6 +431,10 @@
   }
   .patient-selector-panel {
     position: static;
+    align-self: start;
+  }
+  .patient-search {
+    height: 56px;
   }
   .patient-list {
     max-height: 240px;
