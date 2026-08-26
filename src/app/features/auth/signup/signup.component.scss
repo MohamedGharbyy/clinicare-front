@@ -60,5 +60,8 @@
 /* Date of birth: iOS Safari native date inputs have an intrinsic minimum
    width that can exceed the card on small screens. Allow it to shrink. */
 #dateOfBirth {
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
+  box-sizing: border-box;
 }
